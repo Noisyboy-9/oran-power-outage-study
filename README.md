@@ -7,13 +7,24 @@ LaTeX project for the IEEE-style report:
 ## Structure
 
 - `main.tex`: paper entry point.
-- `sections/`: paper body split by section.
+- `sections/`: paper body split according to the report outline, with numeric
+  filename prefixes matching the section order.
 - `references.bib`: BibTeX references.
 - `figures/`: figures and plots used by the paper.
 - `tables/`: larger table sources, if needed.
 - `build/`: generated LaTeX output.
 - `conference_101719.tex`: original downloaded IEEE template, kept as a reference.
 - `IEEEtran.cls`: IEEE class file supplied with the template.
+
+## Draft Outline
+
+1. Introduction
+2. Background and Related Work
+3. System Model and Evaluated Policies
+4. Simulation Methodology
+5. Discussion
+6. Conclusion
+7. References
 
 ## Build
 
