@@ -63,8 +63,7 @@ additional energy cost.
 Service is therefore defined by association rather
 than merely by an in-range edge:
 \begin{equation}
- y_u(t)=\sum_{r\in R}a_{u,r}(t), \qquad
- \mathrm{QoS}(t)=\frac{1}{|U|}\sum_{u\in U}y_u(t).
+ y_u(t)=\sum_{r\in R}a_{u,r}(t).
 \end{equation}
 
 The outage affects the RUs, whose initial battery energies are \(b_r^0\).
@@ -139,18 +138,26 @@ RUs at every controller timestamp.
 
 \subsection{Observed Metrics}
 
-The average emergency QoS includes all \(K+1\) observations:
+We have defined QoS is as the proportion of users receiving service at
+timestamp \(t\):
+\begin{equation}
+ \mathrm{QoS}(t)=\frac{1}{|U|}\sum_{u\in U}y_u(t).
+\end{equation}
+It ranges from zero, when no user is associated, to one, when all users are
+associated.  The average emergency QoS over the simulation horizon includes
+all \(K+1\) observations:
 \begin{equation}
  \overline{\mathrm{QoS}}=\frac{1}{K+1}\sum_{t=0}^{K}\mathrm{QoS}(t).
 \end{equation}
-The observed depletion time of RU \(r\) is
+
+The observed battery-depletion time of RU \(r\) is
 \begin{equation}
  D_r=\begin{cases}
  \min\{t\in\{0,\ldots,K\}:b_r(t)=0\}, & \text{if observed},\\
  \infty, & \text{otherwise}.
  \end{cases}
 \end{equation}
-For an emergency-service target \(\eta\), observed network lifetime is
+For an emergency-service target \(\eta\), the observed network lifetime is
 \begin{equation}
  L_\eta=\begin{cases}
  0, & \mathrm{QoS}(0)<\eta,\\
@@ -158,5 +165,6 @@ For an emergency-service target \(\eta\), observed network lifetime is
  \infty, & \mathrm{QoS}(t)\geq\eta\ \text{for all}\ t\in\{0,\ldots,K\}.
  \end{cases}
 \end{equation}
-Thus, finite metrics are observation-bound, while \(\infty\) denotes that no
-depletion or service violation was observed by the end of the horizon.
+Thus, \(D_r\) and \(L_\eta\) are bounded by the observation horizon; a value
+of \(\infty\) means that the corresponding depletion or service-target
+violation was not observed by the end of the simulation.
