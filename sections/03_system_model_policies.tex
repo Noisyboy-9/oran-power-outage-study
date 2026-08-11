@@ -99,17 +99,18 @@ selected RU only when \(b_r(t)\geq P_0\); otherwise it is sleep.
 
 All policies use the same placement, link-weight, association, and battery
 models.  At each controller timestamp \(t\in\{1,\ldots,K\}\),
-\emph{AlwaysActive} selects every RU, subject to the activation condition
-above.  At a controller timestamp \(t\in\{1,\ldots,K\}\),
+\emph{AlwaysActive} selects every RU, subject to the activation condition.  
+
+At a controller timestamp \(t\in\{1,\ldots,K\}\),
 \emph{StaggeredActive} selects RU \(r\) exactly when
 \begin{equation}
  r\bmod2=\left\lfloor\frac{t}{10}\right\rfloor\bmod2,
 \end{equation}
 so even IDs are selected when \(\lfloor t/10\rfloor\bmod2=0\), and odd IDs
 are selected otherwise; the other parity sleeps.  The 10-timestep schedule
-uses the global timestamp.
-In other words, the policy alternates which RU group is selected: even-ID RUs
-for one 10-timestamp interval, followed by odd-ID RUs for the next.
+uses the global timestamp.  In other words, the policy alternates which RU
+group is selected: even-ID RUs for one 10-timestamp interval, followed by
+odd-ID RUs for the next.
 
 For \emph{ThresholdStaggeredActive}, define the trigger timestamp
 \(\tau\), when it exists, as the first controller timestamp at which every RU
@@ -122,10 +123,9 @@ All RUs are selected at controller timestamps before \(\tau\).  At every
 \(t\in\{\tau,\ldots,K\}\), including \(t=\tau\), the
 \emph{StaggeredActive} rule applies permanently, using the same global
 timestamp rather than restarting its phase.  If no such \(\tau\) is observed,
-all RUs remain selected at every controller timestamp.
-In other words, the policy initially selects all RUs and permanently starts
-the same even--odd alternation once every RU has reached the configured battery
-threshold.
+all RUs remain selected at every controller timestamp.  In other words, the
+policy initially selects all RUs and permanently starts the same even--odd
+alternation once every RU has reached the configured battery threshold.
 
 \subsection{Observed Metrics}
 
