@@ -18,6 +18,7 @@ build/
 .vscode/
 *.swp
 *.swo
+.worktrees/
 
 # Generated PDFs are usually build artifacts. Remove this line if you want to
 # commit release PDFs.
