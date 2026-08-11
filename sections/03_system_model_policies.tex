@@ -6,7 +6,7 @@ they are not an optimization method.
 
 \subsection{Network and Link-Quality Model}
 
-The outage starts before the first observation and lasts for a horizon of
+The outage starts before the first time step and lasts for a horizon of
 \(K\) unit-duration time steps.  Let \(U\) and \(R\) denote the sets of users
 and Radio Units (RUs), respectively.  Users and RUs are stationary, and their locations are
 sampled uniformly at random without replacement from the cells of a discrete
@@ -20,7 +20,7 @@ An in-range bipartite edge exists only when \(d_{u,r}<\rho\), where \(\rho\)
 is the coverage radius.  This in-range topology is fixed during a run.
 
 At every observation timestamp \(t\), each in-range edge receives a newly
-sampled synthetic link weight
+sampled synthetic link weight:
 \begin{equation}
  w_{u,r}(t)=\left(1-\frac{d_{u,r}}{\rho}\right)\xi_{u,r}(t),
  \qquad \xi_{u,r}(t)\in(0,1].
@@ -35,9 +35,8 @@ represents temporal variation that can make real SINR fluctuate even for
 stationary users, such as changing channel or interference conditions,
 without explicitly computing those mechanisms.  The inclusive threshold
 \(\lambda\in[0,1]\) gives the eligibility rule in plain terms: an in-range
-link with \(w_{u,r}(t)\geq\lambda\) may be considered for association, whereas
-a link below \(\lambda\) may not.  The simulator does not calculate
-interference, propagation, throughput, or traffic demand.
+link with \(w_{u,r}(t)\geq\lambda\) will be considered for association, whereas
+a link below \(\lambda\) will not.  
 
 \subsection{Association and Outage Assumptions}
 
@@ -47,18 +46,21 @@ none.  The load on RU \(r\) is
 \begin{equation}
  n_r(t)=\sum_{u\in U}a_{u,r}(t), \qquad n_r(t)\leq C_r,
 \end{equation}
-where \(C_r\) is its user capacity.  For each user in ascending user-ID
+where \(C_r\) is its user capacity. 
+
+For each user in ascending user-ID
 order, the simulator considers candidates with \(w_{u,r}(t)\geq\lambda\),
 ordered by descending weight and then ascending RU ID.  It selects the first
 RU that is active, non-depleted, and not full; otherwise the user remains
 unassociated.  The complete association map is recomputed independently at
 every observation timestamp; associations are neither sticky nor persistent
 across time steps.  The simulator models no handover hysteresis or minimum
-residence time.  A user served by one RU at \(t-1\) may therefore be assigned
+residence time.  Therefore, a user served by one RU at \(t-1\) maybe assigned
 to another at \(t\) when that RU ranks first among the newly ordered eligible
-candidates, for example because it has a higher current link-quality weight.
-Such re-association incurs no modeled delay, temporary service interruption, or
-additional energy cost.  Service is therefore defined by association rather
+candidates. Such re-association incurs no modeled delay, temporary service interruption, or
+additional energy cost.  
+
+Service is therefore defined by association rather
 than merely by an in-range edge:
 \begin{equation}
  y_u(t)=\sum_{r\in R}a_{u,r}(t), \qquad
@@ -89,43 +91,51 @@ For a unit-duration time step, battery discharge is clamped at zero:
  b_r(t)=\max\{0,b_r(t-1)-c_r(t-1)\}.
 \end{equation}
 The state \(x_r(0)\) is the configured initial state, and initial associations
-are observed at \(t=0\).  For each \(t=1,\ldots,K\), the simulator charges
-according to the preceding status
-and associations, applies the controller, regenerates link weights, rebuilds
-associations, and then observes metrics.  A controller can activate a
-selected RU only when \(b_r(t)\geq P_0\); otherwise it is sleep.
+are observed at \(t=0\).  
+
+For each \(t=1,\ldots,K\), the simulator reduces the battery capacities
+according to the preceding status and associations, applies the policy decisions, 
+regenerates link weights, rebuilds associations, and then observes metrics.  
+A controller can activate a selected RU only when \(b_r(t)\geq P_0\); otherwise it is sleep.
 
 \subsection{Evaluated Policies}
 
-All policies use the same placement, link-weight, association, and battery
-models.  At each controller timestamp \(t\in\{1,\ldots,K\}\),
-\emph{AlwaysActive} selects every RU, subject to the activation condition.
+The simulator implements and compares three deterministic policies:
+\emph{AlwaysActive}, \emph{StaggeredActive}, and
+\emph{ThresholdStaggeredActive}.  \emph{AlwaysActive} keeps all feasible RUs
+active, \emph{StaggeredActive} alternates fixed RU groups, and
+\emph{ThresholdStaggeredActive} begins with all RUs selected before switching
+to the same staggered schedule after a battery-based trigger.
 
-At a controller timestamp \(t\in\{1,\ldots,K\}\),
-\emph{StaggeredActive} selects RU \(r\) exactly when
+All policies use the same placement, link-weight, association, and battery
+models.  At each controller timestamp \(t\in\{1,\ldots,K\}\), a policy
+selects the RUs intended to be active; the activation condition specified
+above still prevents a selected RU with insufficient battery energy from
+becoming active.
+
+The baseline \emph{AlwaysActive} policy selects every RU at every controller
+timestamp.
+
+The \emph{StaggeredActive} policy selects RU \(r\) exactly when
 \begin{equation}
  r\bmod2=\left\lfloor\frac{t}{10}\right\rfloor\bmod2,
 \end{equation}
-so even IDs are selected when \(\lfloor t/10\rfloor\bmod2=0\), and odd IDs
-are selected otherwise; the other parity sleeps.  The 10-timestep schedule
-uses the global timestamp.  In other words, the policy alternates which RU
-group is selected: even-ID RUs for one 10-timestamp interval, followed by
-odd-ID RUs for the next.
+at controller timestamp \(t\).  Thus, even-ID RUs are selected when
+\(\lfloor t/10\rfloor\bmod2=0\), whereas odd-ID RUs are selected otherwise;
+the other group sleeps.  The policy uses the global timestamp to alternate
+between the two groups in consecutive 10-timestamp intervals.
 
-For \emph{ThresholdStaggeredActive}, define the trigger timestamp
-\(\tau\), when it exists, as the first controller timestamp at which every RU
-satisfies
+The \emph{ThresholdStaggeredActive} policy follows \emph{AlwaysActive} until
+the battery trigger occurs.  When it exists, the trigger timestamp \(\tau\)
+is the first controller timestamp at which every RU satisfies
 \begin{equation}
  \tau=\min\left\{t\in\{1,\ldots,K\}:b_r(t)\leq
  \frac{\theta}{100}b_r^0\ \text{for all}\ r\in R\right\}.
 \end{equation}
-All RUs are selected at controller timestamps before \(\tau\).  At every
-\(t\in\{\tau,\ldots,K\}\), including \(t=\tau\), the
-\emph{StaggeredActive} rule applies permanently, using the same global
-timestamp rather than restarting its phase.  If no such \(\tau\) is observed,
-all RUs remain selected at every controller timestamp.  In other words, the
-policy initially selects all RUs and permanently starts the same even--odd
-alternation once every RU has reached the configured battery threshold.
+At every \(t\in\{\tau,\ldots,K\}\), including \(t=\tau\), it applies the
+\emph{StaggeredActive} rule using the same global timestamp, rather than
+restarting the schedule.  If no such \(\tau\) occurs, the policy selects all
+RUs at every controller timestamp.
 
 \subsection{Observed Metrics}
 
