@@ -25,10 +25,19 @@ sampled synthetic link weight
  w_{u,r}(t)=\left(1-\frac{d_{u,r}}{\rho}\right)\xi_{u,r}(t),
  \qquad \xi_{u,r}(t)\in(0,1].
 \end{equation}
-The inclusive threshold \(\lambda\in[0,1]\) determines whether an in-range
-edge is a candidate for service: \(w_{u,r}(t)\geq\lambda\).  These weights
-are an abstract link-quality signal only; the simulator does not calculate
-SINR, interference, propagation, throughput, or traffic demand.
+The normalized score \(w_{u,r}(t)\) is the simulator's proxy for real-world
+SINR behaviour, not a calculated physical SINR value.  Its deterministic
+factor \((1-d_{u,r}/\rho)\) represents expected link deterioration with
+distance: nearby pairs have greater baseline quality, which approaches zero
+as the coverage boundary is approached.  Independently at each observation,
+\(\xi_{u,r}(t)\) is sampled uniformly at random from \((0,1]\).  This factor
+represents temporal variation that can make real SINR fluctuate even for
+stationary users, such as changing channel or interference conditions,
+without explicitly computing those mechanisms.  The inclusive threshold
+\(\lambda\in[0,1]\) gives the eligibility rule in plain terms: an in-range
+link with \(w_{u,r}(t)\geq\lambda\) may be considered for association, whereas
+a link below \(\lambda\) may not.  The simulator does not calculate
+interference, propagation, throughput, or traffic demand.
 
 \subsection{Association and Outage Assumptions}
 
