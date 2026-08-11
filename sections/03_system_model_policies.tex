@@ -1,26 +1,123 @@
 \section{System Model and Evaluated Policies}
 
-Define the modeled system and the policies compared in the experiments.
+This section defines the discrete-time outage model implemented by the
+simulator.  The policies below are fixed policies evaluated comparatively;
+they are not an optimisation method.
 
-\subsection{Network Model}
-Describe the radio units, users, topology, traffic assumptions, and any
-abstractions used by the simulator.
+\subsection{Network and Link-Quality Model}
 
-\subsection{Outage Assumptions}
-Specify outage duration, backup power availability, affected infrastructure,
-and recovery assumptions.
+The outage starts before the first observation and lasts for a horizon of
+\(K\) unit-duration timesteps.  Let \(U\) and \(R\) denote the sets of users
+and RUs, respectively.  Users and RUs are stationary and are placed uniformly
+without replacement on the cells of a discrete \(W\times H\) grid.  Thus, no
+two entities occupy the same cell.  With locations \(p_u=(x_u,y_u)\) and
+\(p_r=(x_r,y_r)\), their Euclidean distance is
+\begin{equation}
+ d_{u,r}=\sqrt{(x_u-x_r)^2+(y_u-y_r)^2}.
+\end{equation}
+An in-range bipartite edge exists only when \(d_{u,r}<\rho\), where \(\rho\)
+is the coverage radius.  This in-range topology is fixed during a run.
 
-\subsection{Connectivity and SINR Model}
-Define how user connectivity and signal-to-interference-plus-noise ratio are
-computed or approximated.
+At every observation timestamp \(t\), each in-range edge receives a newly
+sampled synthetic link weight
+\begin{equation}
+ w_{u,r}(t)=\left(1-\frac{d_{u,r}}{\rho}\right)\xi_{u,r}(t),
+ \qquad \xi_{u,r}(t)\in(0,1].
+\end{equation}
+The inclusive threshold \(\lambda\in[0,1]\) determines whether an in-range
+edge is a candidate for service: \(w_{u,r}(t)\geq\lambda\).  These weights
+are an abstract link-quality signal only; the simulator does not calculate
+SINR, interference, propagation, throughput, or traffic demand.
 
-\subsection{Battery Model}
-Describe battery capacity, discharge behavior, sleep-state power consumption,
-and active-state power consumption.
+\subsection{Association and Outage Assumptions}
 
-\subsection{Emergency QoS Definition}
-Define the quality-of-service threshold or service condition used for
-emergency connectivity.
+Let \(a_{u,r}(t)\in\{0,1\}\) be the association decision.  Associations are
+exclusive, so \(\sum_{r\in R}a_{u,r}(t)\leq1\): a user has one serving RU or
+none.  The load on RU \(r\) is
+\begin{equation}
+ n_r(t)=\sum_{u\in U}a_{u,r}(t), \qquad n_r(t)\leq C_r,
+\end{equation}
+where \(C_r\) is its user capacity.  For each user in ascending user-ID
+order, the simulator considers candidates with \(w_{u,r}(t)\geq\lambda\),
+ordered by descending weight and then ascending RU ID.  It selects the first
+RU that is active, non-depleted, and not full; otherwise the user remains
+unassociated.  Hence service is defined by association rather than merely by
+an in-range edge:
+\begin{equation}
+ y_u(t)=\sum_{r\in R}a_{u,r}(t), \qquad
+ \mathrm{QoS}(t)=\frac{1}{|U|}\sum_{u\in U}y_u(t).
+\end{equation}
+
+The outage affects the RUs, whose initial battery energies are \(b_r^0\).
+There is no recharge, recovery, or state-switching time or energy cost.  An
+RU is depleted when its battery is zero and cannot serve users.
+
+\subsection{Battery Model and State Transitions}
+
+Let \(b_r(t)\) be the battery after the update at timestamp \(t\), and let
+\(s_r(t)\in\{\mathrm{S},\mathrm{A}\}\) be its observed sleep or active state.
+With positive consumption rates \(P_s\), \(P_0\), \(P_1\), and \(P_m\), the
+consumption implied by the preceding state and association is
+\begin{equation}
+ c_r(t-1)=
+ \begin{cases}
+ P_s, & s_r(t-1)=\mathrm{S},\\
+ P_0, & s_r(t-1)=\mathrm{A},\ n_r(t-1)=0,\\
+ P_1, & s_r(t-1)=\mathrm{A},\ n_r(t-1)=1,\\
+ n_r(t-1)P_m, & s_r(t-1)=\mathrm{A},\ n_r(t-1)\geq2.
+ \end{cases}
+\end{equation}
+For a unit-duration timestep, battery discharge is clamped at zero:
+\begin{equation}
+ b_r(t)=\max\{0,b_r(t-1)-c_r(t-1)\}.
+\end{equation}
+Initial states and associations are observed at \(t=0\).  For each
+\(t=1,\ldots,K\), the simulator charges according to the preceding status
+and associations, applies the controller, regenerates link weights, rebuilds
+associations, and then observes metrics.  A controller can activate a
+selected RU only when \(b_r(t)\geq P_0\); otherwise it is sleep.
 
 \subsection{Evaluated Policies}
-Describe each baseline and proposed sleep policy compared in the evaluation.
+
+All policies use the same placement, link-weight, association, and battery
+models.  \emph{Always active} selects every RU at every timestamp, subject to
+the activation condition above.  \emph{Periodic staggered sleep} selects RU
+\(r\) exactly when
+\begin{equation}
+ r\bmod2=\left\lfloor\frac{t}{10}\right\rfloor\bmod2,
+\end{equation}
+so even IDs are selected when \(\lfloor t/10\rfloor\bmod2=0\), and odd IDs
+are selected otherwise; the other parity sleeps.  The 10-timestep schedule
+uses the global timestamp.
+
+For \emph{threshold-triggered staggered sleep}, all RUs are selected until
+the first timestamp at which every RU satisfies
+\begin{equation}
+ b_r(t)\leq\frac{\theta}{100}b_r^0.
+\end{equation}
+Thereafter the periodic staggered rule applies permanently, using the same
+global timestamp rather than restarting its phase.
+
+\subsection{Observed Metrics}
+
+The average emergency QoS includes all \(K+1\) observations:
+\begin{equation}
+ \overline{\mathrm{QoS}}=\frac{1}{K+1}\sum_{t=0}^{K}\mathrm{QoS}(t).
+\end{equation}
+The observed depletion time of RU \(r\) is
+\begin{equation}
+ D_r=\begin{cases}
+ \min\{t\in\{0,\ldots,K\}:b_r(t)=0\}, & \text{if observed},\\
+ \infty, & \text{otherwise}.
+ \end{cases}
+\end{equation}
+For an emergency-service target \(\eta\), observed network lifetime is
+\begin{equation}
+ L_\eta=\begin{cases}
+ 0, & \mathrm{QoS}(0)<\eta,\\
+ t^\star-1, & t^\star=\min\{t\in\{1,\ldots,K\}:\mathrm{QoS}(t)<\eta\},\\
+ \infty, & \mathrm{QoS}(t)\geq\eta\ \text{for all}\ t\in\{0,\ldots,K\}.
+ \end{cases}
+\end{equation}
+Thus, finite metrics are observation-bound, while \(\infty\) denotes that no
+depletion or service violation was observed by the end of the horizon.
