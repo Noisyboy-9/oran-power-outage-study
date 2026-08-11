@@ -108,6 +108,8 @@ above.  At a controller timestamp \(t\in\{1,\ldots,K\}\),
 so even IDs are selected when \(\lfloor t/10\rfloor\bmod2=0\), and odd IDs
 are selected otherwise; the other parity sleeps.  The 10-timestep schedule
 uses the global timestamp.
+In other words, the policy alternates which RU group is selected: even-ID RUs
+for one 10-timestamp interval, followed by odd-ID RUs for the next.
 
 For \emph{ThresholdStaggeredActive}, define the trigger timestamp
 \(\tau\), when it exists, as the first controller timestamp at which every RU
@@ -121,6 +123,9 @@ All RUs are selected at controller timestamps before \(\tau\).  At every
 \emph{StaggeredActive} rule applies permanently, using the same global
 timestamp rather than restarting its phase.  If no such \(\tau\) is observed,
 all RUs remain selected at every controller timestamp.
+In other words, the policy initially selects all RUs and permanently starts
+the same even--odd alternation once every RU has reached the configured battery
+threshold.
 
 \subsection{Observed Metrics}
 
