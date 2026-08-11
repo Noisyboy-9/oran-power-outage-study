@@ -51,8 +51,15 @@ where \(C_r\) is its user capacity.  For each user in ascending user-ID
 order, the simulator considers candidates with \(w_{u,r}(t)\geq\lambda\),
 ordered by descending weight and then ascending RU ID.  It selects the first
 RU that is active, non-depleted, and not full; otherwise the user remains
-unassociated.  Hence service is defined by association rather than merely by
-an in-range edge:
+unassociated.  The complete association map is recomputed independently at
+every observation timestamp; associations are neither sticky nor persistent
+across timesteps.  The simulator models no handover hysteresis or minimum
+residence time.  A user served by one RU at \(t-1\) may therefore be assigned
+to another at \(t\) when that RU ranks first among the newly ordered eligible
+candidates, for example because it has a higher current link-quality weight.
+Such reassociation incurs no modeled delay, temporary service interruption, or
+additional energy cost.  Service is therefore defined by association rather
+than merely by an in-range edge:
 \begin{equation}
  y_u(t)=\sum_{r\in R}a_{u,r}(t), \qquad
  \mathrm{QoS}(t)=\frac{1}{|U|}\sum_{u\in U}y_u(t).
