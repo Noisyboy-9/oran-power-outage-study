@@ -55,24 +55,25 @@ RU is depleted when its battery is zero and cannot serve users.
 \subsection{Battery Model and State Transitions}
 
 Let \(b_r(t)\) be the battery after the update at timestamp \(t\), and let
-\(s_r(t)\in\{\mathrm{S},\mathrm{A}\}\) be its observed sleep or active state.
+\(x_r(t)\in\{\mathrm{S},\mathrm{A}\}\) be its observed sleep or active state.
 With positive consumption rates \(P_s\), \(P_0\), \(P_1\), and \(P_m\), the
 consumption implied by the preceding state and association is
 \begin{equation}
  c_r(t-1)=
  \begin{cases}
- P_s, & s_r(t-1)=\mathrm{S},\\
- P_0, & s_r(t-1)=\mathrm{A},\ n_r(t-1)=0,\\
- P_1, & s_r(t-1)=\mathrm{A},\ n_r(t-1)=1,\\
- n_r(t-1)P_m, & s_r(t-1)=\mathrm{A},\ n_r(t-1)\geq2.
+ P_s, & x_r(t-1)=\mathrm{S},\\
+ P_0, & x_r(t-1)=\mathrm{A},\ n_r(t-1)=0,\\
+ P_1, & x_r(t-1)=\mathrm{A},\ n_r(t-1)=1,\\
+ n_r(t-1)P_m, & x_r(t-1)=\mathrm{A},\ n_r(t-1)\geq2.
  \end{cases}
 \end{equation}
 For a unit-duration timestep, battery discharge is clamped at zero:
 \begin{equation}
  b_r(t)=\max\{0,b_r(t-1)-c_r(t-1)\}.
 \end{equation}
-Initial states and associations are observed at \(t=0\).  For each
-\(t=1,\ldots,K\), the simulator charges according to the preceding status
+The state \(x_r(0)\) is the configured initial state, and initial associations
+are observed at \(t=0\).  For each \(t=1,\ldots,K\), the simulator charges
+according to the preceding status
 and associations, applies the controller, regenerates link weights, rebuilds
 associations, and then observes metrics.  A controller can activate a
 selected RU only when \(b_r(t)\geq P_0\); otherwise it is sleep.
@@ -80,9 +81,10 @@ selected RU only when \(b_r(t)\geq P_0\); otherwise it is sleep.
 \subsection{Evaluated Policies}
 
 All policies use the same placement, link-weight, association, and battery
-models.  \emph{Always active} selects every RU at every timestamp, subject to
-the activation condition above.  \emph{Periodic staggered sleep} selects RU
-\(r\) exactly when
+models.  At each controller timestamp \(t\in\{1,\ldots,K\}\),
+\emph{always active} selects every RU, subject to the activation condition
+above.  At a controller timestamp \(t\in\{1,\ldots,K\}\), \emph{periodic
+staggered sleep} selects RU \(r\) exactly when
 \begin{equation}
  r\bmod2=\left\lfloor\frac{t}{10}\right\rfloor\bmod2,
 \end{equation}
@@ -90,13 +92,18 @@ so even IDs are selected when \(\lfloor t/10\rfloor\bmod2=0\), and odd IDs
 are selected otherwise; the other parity sleeps.  The 10-timestep schedule
 uses the global timestamp.
 
-For \emph{threshold-triggered staggered sleep}, all RUs are selected until
-the first timestamp at which every RU satisfies
+For \emph{threshold-triggered staggered sleep}, define the trigger timestamp
+\(\tau\), when it exists, as the first controller timestamp at which every RU
+satisfies
 \begin{equation}
- b_r(t)\leq\frac{\theta}{100}b_r^0.
+ \tau=\min\left\{t\in\{1,\ldots,K\}:b_r(t)\leq
+ \frac{\theta}{100}b_r^0\ \text{for all}\ r\in R\right\}.
 \end{equation}
-Thereafter the periodic staggered rule applies permanently, using the same
-global timestamp rather than restarting its phase.
+All RUs are selected at controller timestamps before \(\tau\).  At every
+\(t\in\{\tau,\ldots,K\}\), including \(t=\tau\), the periodic staggered rule
+applies permanently, using the same global timestamp rather than restarting
+its phase.  If no such \(\tau\) is observed, all RUs remain selected at every
+controller timestamp.
 
 \subsection{Observed Metrics}
 
