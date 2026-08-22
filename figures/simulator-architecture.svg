@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title description">
+  <title id="title">Simulator architecture and information flow</title>
+  <desc id="description">The simulation controller coordinates the environment, RU controller, and metric collectors at each timestep.</desc>
+  <defs>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2b5c88"/>
+    </marker>
+    <marker id="arrow-slate" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#51606f"/>
+    </marker>
+    <style>
+      .heading { font-family: Arial, Helvetica, sans-serif; font-size: 31px; font-weight: 700; fill: #182433; }
+      .box-title { font-family: Arial, Helvetica, sans-serif; font-size: 27px; font-weight: 700; fill: #182433; }
+      .body { font-family: Arial, Helvetica, sans-serif; font-size: 21px; fill: #263746; }
+      .small { font-family: Arial, Helvetica, sans-serif; font-size: 19px; fill: #263746; }
+      .label { font-family: Arial, Helvetica, sans-serif; font-size: 18px; font-weight: 700; fill: #2b5c88; }
+      .subbox { fill: #ffffff; stroke: #cad5df; stroke-width: 2; }
+      .flow { fill: none; stroke: #2b5c88; stroke-width: 4; marker-end: url(#arrow-blue); }
+      .flow-slate { fill: none; stroke: #51606f; stroke-width: 3.5; stroke-dasharray: 10 8; marker-end: url(#arrow-slate); }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" fill="#ffffff"/>
+  <text x="800" y="60" text-anchor="middle" class="heading">Simulator architecture and information flow</text>
+
+  <!-- Simulation controller -->
+  <rect x="445" y="105" width="710" height="145" rx="18" fill="#dbeaf7" stroke="#2b5c88" stroke-width="3"/>
+  <text x="800" y="155" text-anchor="middle" class="box-title">Simulation controller</text>
+  <text x="800" y="194" text-anchor="middle" class="body">Initialises the run, advances the timestamp, updates the environment,</text>
+  <text x="800" y="224" text-anchor="middle" class="body">and triggers metric collection.</text>
+
+  <!-- Environment -->
+  <rect x="100" y="355" width="790" height="400" rx="18" fill="#eef6fc" stroke="#2b5c88" stroke-width="3"/>
+  <text x="495" y="410" text-anchor="middle" class="box-title">Environment</text>
+  <text x="495" y="444" text-anchor="middle" class="body">Owns the mutable simulation state</text>
+
+  <rect x="145" y="480" width="340" height="105" rx="12" class="subbox"/>
+  <text x="315" y="522" text-anchor="middle" class="small" font-weight="700">Map, RUs, and users</text>
+  <text x="315" y="555" text-anchor="middle" class="small">Locations and battery/status state</text>
+
+  <rect x="505" y="480" width="340" height="105" rx="12" class="subbox"/>
+  <text x="675" y="522" text-anchor="middle" class="small" font-weight="700">Connectivity graph</text>
+  <text x="675" y="555" text-anchor="middle" class="small">In-range links and link-quality values</text>
+
+  <rect x="325" y="620" width="340" height="95" rx="12" class="subbox"/>
+  <text x="495" y="660" text-anchor="middle" class="small" font-weight="700">User--RU associations</text>
+  <text x="495" y="692" text-anchor="middle" class="small">Service state and RU load</text>
+
+  <!-- Metric collectors -->
+  <rect x="1080" y="350" width="420" height="150" rx="18" fill="#e8f4ec" stroke="#427b56" stroke-width="3"/>
+  <text x="1290" y="400" text-anchor="middle" class="box-title">Metric collectors</text>
+  <text x="1290" y="438" text-anchor="middle" class="body">Observe QoS, battery depletion,</text>
+  <text x="1290" y="468" text-anchor="middle" class="body">and network lifetime</text>
+
+  <!-- RU controller -->
+  <rect x="1080" y="560" width="420" height="230" rx="18" fill="#fff3df" stroke="#bd7b22" stroke-width="3"/>
+  <text x="1290" y="610" text-anchor="middle" class="box-title">RU controller</text>
+  <text x="1290" y="649" text-anchor="middle" class="body">Applies the selected policy</text>
+  <line x1="1120" y1="675" x2="1460" y2="675" stroke="#e5c690" stroke-width="2"/>
+  <text x="1290" y="715" text-anchor="middle" class="small">Always Active</text>
+  <text x="1290" y="747" text-anchor="middle" class="small">Staggered Active</text>
+  <text x="1290" y="779" text-anchor="middle" class="small">Threshold Staggered Active</text>
+
+  <!-- Data flows -->
+  <path d="M 690 250 L 570 355" class="flow"/>
+  <text x="560" y="305" text-anchor="middle" class="label">update at timestamp t</text>
+
+  <path d="M 890 620 L 1094 620" class="flow-slate"/>
+  <text x="992" y="598" text-anchor="middle" class="label">RU state, t</text>
+
+  <path d="M 1066 700 L 890 700" class="flow"/>
+  <text x="992" y="730" text-anchor="middle" class="label">status decisions</text>
+
+  <path d="M 890 430 L 1094 430" class="flow"/>
+  <text x="992" y="408" text-anchor="middle" class="label">state snapshot</text>
+
+  <path d="M 1050 250 L 1290 350" class="flow-slate"/>
+  <text x="1180" y="290" text-anchor="middle" class="label">observation trigger</text>
+
+  <!-- Legend -->
+  <line x1="115" y1="835" x2="185" y2="835" class="flow"/>
+  <text x="205" y="842" class="small">state update or data flow</text>
+  <line x1="480" y1="835" x2="550" y2="835" class="flow-slate"/>
+  <text x="570" y="842" class="small">controller input or trigger</text>
+</svg>
