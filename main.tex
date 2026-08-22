@@ -6,6 +6,18 @@
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
+\usepackage{listings}
+
+\newcommand{\codefont}{\rmfamily}
+\renewcommand{\lstlistingname}{Algorithm}
+\lstdefinestyle{pseudocode}{
+  basicstyle=\footnotesize\codefont,
+  frame=single,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false
+}
 
 \graphicspath{{figures/}}
 
