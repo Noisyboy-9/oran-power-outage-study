@@ -6,6 +6,27 @@
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
+\usepackage[hyphens]{url}
+
+% Upright mathematical styling for policy abbreviations.
+\newcommand{\policyabbr}[1]{\ensuremath{\mathrm{#1}}}
+
+% Compact package-free algorithm float for conventional pseudocode.
+\newcounter{algorithm}
+\renewcommand{\thealgorithm}{\arabic{algorithm}}
+\newenvironment{algorithm}[1]{%
+  \refstepcounter{algorithm}%
+  \begin{figure}[t]
+    \centering
+    \footnotesize
+    \begin{minipage}{0.96\columnwidth}
+      \textbf{Algorithm~\thealgorithm: #1}\par
+      \vspace{2pt}\hrule\vspace{2pt}
+}{%
+      \vspace{2pt}\hrule
+    \end{minipage}
+  \end{figure}
+}
 
 \graphicspath{{figures/}}
 
@@ -33,8 +54,7 @@ s.shariati-1@student.utwente.nl}
 \input{sections/06_conclusion}
 \input{sections/07_generative_ai_disclosure}
 
-% References are generated here after cited sources are added.
-% \bibliographystyle{ieeetr}
-% \bibliography{references}
+\bibliographystyle{ieeetr}
+\bibliography{references}
 
 \end{document}

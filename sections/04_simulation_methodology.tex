@@ -1,1 +1,56 @@
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=\textwidth]{simulator-architecture}
+    \caption{Simulator architecture and information flow. The simulation controller coordinates the environment, RU controller, and metric collectors at each timestep.}
+    \label{fig:simulator-architecture}
+\end{figure*}
+
 \section{Simulation Methodology}
+\label{sec:simulation-methodology}
+
+We developed an open-source\footnote{https://github.com/Noisyboy-9/oran-power-outage-simulator}, discrete-time simulator in Python to evaluate the trade-off between emergency connectivity and RU battery lifetime during power outages. This study analyzes the comparative behavior of predefined RU sleep policies in a controlled, deliberately simplified model. The simulator includes only the mechanisms essential for this comparison: RU battery depletion, active and sleep states, stochastic link quality, user--RU association, and policy-driven state transitions.
+
+Several established platforms for cellular network simulation exist, but they offer capabilities beyond this study's requirements and introduce unnecessary complexity. For example, 5G-LENA\cite{cttc5gLena} and Simu5G\cite{simu5g} support detailed cellular network simulation, while the NIST\cite{nistNrSidelink} module models O-RAN-like RIC interactions. The srsRAN\cite{srsran} project provides a complete 5G CU/DU software stack, and Colosseum\cite{colosseum}, Arena\cite{arena}, POWDER\cite{powder}, and OpenRAN Gym\cite{bonatiOpenRANGym} facilitate emulation and testbed-based experimentation. 
+
+We did not select these platforms because, to the best of our knowledge, replicating the abstract outage, battery, and association model used in this study would require substantial additional configuration and calibration, without directly benefiting the policy-level comparison. The implemented simulator instead offers a transparent and reproducible environment in which the evaluated policy is the primary experimental variable. This simulator is used exclusively for controlled, policy-level comparisons within the simplified model described in Section~\ref{sec:system-model}. The findings are constrained by the specific assumptions and procedures defined in the study and do not substitute for physical-layer simulation or real-world testing.
+
+The rest of this section is organized as follows: sub-section~\ref{subsec:simulation-architecture} describes the simulator architecture and execution procedure. Section~\ref{subsec:experimental-configuration} presents the experimental configuration and policy comparison. Section~\ref{subsec:metrics-analysis} defines the metrics, analysis procedure, and implementation-verification checks.
+
+\subsection{Simulation Architecture and Execution}
+\label{subsec:simulation-architecture}
+
+The simulator comprises an environment, an RU controller, and metric collectors. The environment maintains the map, RU and user entities, their locations, the connectivity graph, and the current user--RU associations. The controller applies one of the evaluated sleep policies at each timestep. Metric collectors observe the resulting state without influencing the simulation. Figure~\ref{fig:simulator-architecture} depicts the simulator's overall architecture.
+
+Each simulation run begins at timestamp \(t=0\), when the simulator constructs the environment, generates initial link-quality values, establishes user--RU associations, and records the initial metric observations. The simulation then executes \(100\) unit-duration timesteps. During each timestep, the simulator first updates RU batteries based on their preceding state and user load. It then applies the selected policy, regenerates link-quality values, recomputes user associations, and records the resulting metrics. This sequence ensures that battery consumption at timestamp \(t\) is determined by the RU state and user associations observed at timestamp \(t-1\), as described in Section~\ref{sec:system-model}.
+
+Algorithm~\ref{alg:simulation-execution} summarizes the simulation control procedure. Algorithm~\ref{alg:environment-update} outlines the environment-update procedure, whose individual actions correspond to the battery, policy, link-quality, and association models defined in Section~\ref{sec:system-model}.
+
+\input{algorithms/simulation_execution}
+
+\input{algorithms/environment_update}
+
+\subsection{Experimental Configuration and Policy Comparison}
+\label{subsec:experimental-configuration}
+
+Table~\ref{tab:baseline-configuration} summarises the baseline configuration used in every simulation run. The simulation uses a \(20\times20\) discrete grid containing five RUs and thirty users. Entity locations are sampled uniformly without replacement, such that no two entities occupy the same cell. Users and RUs remain stationary for the duration of a run.
+
+\input{tables/baseline_simulation_configuration}
+
+The time and energy values in Table~\ref{tab:baseline-configuration} are expressed in simulation units. They are not interpreted as seconds, minutes, Joules, or measured hardware power values. This approach enables explicit modeling of energy consumption for policy comparison without implying a direct mapping to a specific RU implementation.
+
+To represent the effect of user load on battery depletion, an active RU incurs a non-zero consumption rate even when it serves no users, because its radio and supporting circuitry must remain powered to maintain availability. Serving the first user is modeled as a transition from an availability-only state to a traffic-bearing state, which introduces additional processing and transmission demand. For two or more served users, the model increases consumption per user in proportion to represent additional scheduling, baseband processing, and transmission activity. The resulting rates therefore distinguish between baseline active operation, the onset of traffic service, and load-dependent energy consumption.
+
+The experiment compares three policies: Always Active, Staggered Active, and Threshold Staggered Active, abbreviated as \policyabbr{AA}, \policyabbr{SA}, and \policyabbr{TSA}, respectively. These policies serve as simple, transparent baselines. \policyabbr{AA} represents the availability-oriented baseline in which every feasible RU remains active. \policyabbr{SA} represents a periodic energy-saving strategy in which fixed RU groups alternate between active and sleep states every 10 time steps. \policyabbr{TSA} represents a hybrid strategy that begins with all feasible RUs active and introduces staggered sleeping only after battery capacities reach the configured threshold. Their decision rules are defined in Section~\ref{sec:system-model}.
+
+These policies serve as reference points for assessing whether straightforward sleep scheduling can preserve emergency service while extending battery availability in real-world scenarios. They are not intended as optimal outage-management strategies. Accordingly, the comparison examines the limitations and trade-offs of simple policy logic and assesses whether a more sophisticated policy is necessary.
+
+To increase the generalizability of final results, we conduct multiple simulation repetitions using different seed values. Within each repetition, all three policies use the same seed, ensuring identical RU and user placements and the same sequence of stochastic link-quality values. This paired design reduces the influence of random topology and link variation on the comparison, isolating the selected policy as the intended experimental factor while ensuring the policy is tested across multiple RU and user placements and stochastic link-quality values.
+
+\subsection{Metrics, Analysis Procedure, and Implementation Verification}
+\label{subsec:metrics-analysis}
+
+As shown in Figure~\ref{fig:simulator-architecture}, the simulator records observations at timestamp \(t=0\) and after each of the \(100\) timestep updates. The collected metrics are the served-user fraction over time, average emergency QoS, RU battery-depletion time, and network lifetime as defined in section~\ref{sec:system-model}.
+
+Each policy produces ten final values for every metric, one for each repetition. We retain these values as distributions rather than reducing them immediately to a single mean. Aggregate summaries use medians and interquartile ranges to describe variation between repetitions. The time-series observations similarly support comparison of the typical trajectory and variability of emergency service and RU battery levels across policies.
+
+We verify the implementation through deterministic and behavioral checks. First, identical configurations and random seeds must produce identical simulation outputs. Second, a depleted RU must not serve a user. Third, sleep-state consumption must remain lower than active-state consumption under the configured model. Finally, when all other conditions are unchanged, increasing the initial battery capacity must not reduce the observed battery lifetime. These checks confirm consistency between the implementation and the model defined in Section~\ref{sec:system-model}.

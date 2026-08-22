@@ -1,0 +1,30 @@
+\begin{table}[!ht]
+    \caption{Baseline simulation configuration.}
+    \label{tab:baseline-configuration}
+    \centering
+    \footnotesize
+    \setlength{\tabcolsep}{3pt}
+    \renewcommand{\arraystretch}{1.1}
+    \begin{tabular}{p{0.62\columnwidth} p{0.32\columnwidth}}
+        \hline
+        \textbf{Parameter} & \textbf{Value} \\
+        \hline
+        Simulation & \(20\times20\) grid cells \\
+        Number of RUs & 5 \\
+        Number of users & 30 \\
+        Initial RU battery & 250 \\
+        Initial RU status & Active \\
+        Active with zero users consumption & 1.0 per step \\
+        Active with one user consumption & 2.0 per step \\
+        Active with two or more users consumption & 1.5 per user and step \\
+        Sleep consumption & 0.5 per step \\
+        RU user capacity & 100 users \\
+        Coverage radius & 8 grid cells \\
+        Simulation horizon & 100 timesteps \\
+        Staggered-policy interval & 10 timesteps \\
+        Threshold-policy trigger & 50\% of initial battery \\
+        Minimum Emergency QoS (SLA) & 0.7 \\
+        Number of simulation repetitions & 10 \\
+        \hline
+    \end{tabular}
+\end{table}

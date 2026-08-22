@@ -1,9 +1,11 @@
-.PHONY: all clean distclean watch
+.PHONY: all build clean distclean watch
 
 MAIN := main.tex
 
 all:
 	latexmk -pdf $(MAIN)
+
+build: all
 
 watch:
 	latexmk -pdf -pvc $(MAIN)

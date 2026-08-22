@@ -23,3 +23,4 @@ build/
 # Generated PDFs are usually build artifacts. Remove this line if you want to
 # commit release PDFs.
 *.pdf
+!figures/simulator-architecture.pdf
