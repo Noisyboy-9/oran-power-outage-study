@@ -6,17 +6,22 @@
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
-\usepackage{listings}
 
-\newcommand{\codefont}{\rmfamily}
-\renewcommand{\lstlistingname}{Algorithm}
-\lstdefinestyle{pseudocode}{
-  basicstyle=\footnotesize\codefont,
-  frame=single,
-  breaklines=true,
-  columns=fullflexible,
-  keepspaces=true,
-  showstringspaces=false
+% Compact package-free algorithm float for conventional pseudocode.
+\newcounter{algorithm}
+\renewcommand{\thealgorithm}{\arabic{algorithm}}
+\newenvironment{algorithm}[1]{%
+  \refstepcounter{algorithm}%
+  \begin{figure}[t]
+    \centering
+    \footnotesize
+    \begin{minipage}{0.96\columnwidth}
+      \textbf{Algorithm~\thealgorithm: #1}\par
+      \vspace{2pt}\hrule\vspace{2pt}
+}{%
+      \vspace{2pt}\hrule
+    \end{minipage}
+  \end{figure}
 }
 
 \graphicspath{{figures/}}

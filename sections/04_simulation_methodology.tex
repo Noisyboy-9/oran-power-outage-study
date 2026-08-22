@@ -20,67 +20,30 @@ The simulator comprises an environment, an RU controller, and metric collectors.
 
 Each simulation run begins at timestamp \(t=0\), when the simulator constructs the environment, generates initial link-quality values, establishes user--RU associations, and records the initial metric observations. The simulation then executes 100 unit-duration timesteps. During each timestep, the simulator first updates RU batteries based on their preceding state and user load. It then applies the selected policy, regenerates link-quality values, recomputes user associations, and records the resulting metrics. This sequence ensures that battery consumption at timestamp \(t\) is determined by the RU state and user associations observed at timestamp \(t-1\), as described in Section~\ref{sec:system-model}.
 
-Algorithm~\ref{alg:simulation-execution} summarizes the simulation control procedure, which calls {\codefont UPDATE\_ENVIRONMENT()} on each timestamp. Moreover, Algorithm~\ref{alg:environment-update} details the {\codefont UPDATE\_ENVIRONMENT()} procedure and connects it to the related formula of the problem model outlined in Section~\ref{sec:system-model}.
+Algorithm~\ref{alg:simulation-execution} summarizes the simulation control procedure. Algorithm~\ref{alg:environment-update} outlines the environment-update procedure, whose individual actions correspond to the battery, policy, link-quality, and association models defined in Section~\ref{sec:system-model}.
 
-\begin{lstlisting}[style=pseudocode, caption={Simulation execution procedure.}, label={alg:simulation-execution}]
-procedure RUN_SIMULATION(configuration)
-    environment <- BUILD_ENVIRONMENT(configuration)
-    controller  <- BUILD_CONTROLLER(configuration.policy)
-    collectors  <- BUILD_METRIC_COLLECTORS(configuration.metrics)
-    timestamp <- 0
+\begin{algorithm}{Simulation execution procedure}
+\label{alg:simulation-execution}
+\begin{tabular}{@{}r@{\quad}p{0.82\linewidth}@{}}
+1 & \textbf{Initialize} the environment, selected controller, and metric collectors. \\
+2 & Set \(t \leftarrow 0\) and record the initial metric observations. \\
+3 & \textbf{for} \(t \leftarrow 1\) \textbf{to} \(K\) \textbf{do} \\
+4 & \quad Update the environment at timestamp \(t\). \\
+5 & \quad Record metric observations at timestamp \(t\). \\
+6 & \textbf{end for} \\
+7 & Finalize and store the metric results. \\
+\end{tabular}
+\end{algorithm}
 
-    COLLECT_METRICS(collectors, environment, timestamp)
-
-    for timestamp <- 1 to configuration.simulation_horizon do
-        UPDATE_ENVIRONMENT(
-            environment,
-            controller,
-            timestamp,
-            configuration.link_quality_threshold
-        )
-        COLLECT_METRICS(collectors, environment, timestamp)
-    end for
-
-    return FINALISE_METRICS(collectors)
-end procedure
-\end{lstlisting}
-
-\begin{lstlisting}[style=pseudocode, caption={Environment-update procedure.}, label={alg:environment-update}]
-procedure UPDATE_ENVIRONMENT(environment, controller, timestamp, threshold)
-    for each ru in environment.RUs do
-        previous_load <- COUNT_ASSOCIATED_USERS(ru)
-        UPDATE_BATTERY(ru, previous_load)
-    end for
-
-    controller.UPDATE(environment.RUs, timestamp)
-
-    REGENERATE_LINK_QUALITY(environment)
-
-    associations  <- empty map
-    assigned_load <- map each ru to 0
-    for each user in SORT_ASCENDING(environment.users, by user_id) do
-        candidates <- GET_IN_RANGE_RUS(user, environment)
-        candidates <- FILTER_BY_LINK_THRESHOLD(candidates, threshold)
-        candidates <- SORT_DESCENDING(candidates, by link_quality)
-
-        for each ru in candidates do
-            if ru.status = ACTIVE and
-               ru.battery > 0 and
-               assigned_load[ru] < ru.user_capacity then
-                associations[user] <- ru
-                assigned_load[ru] <- assigned_load[ru] + 1
-                break
-            end if
-        end for
-
-        if user not in associations then
-            associations[user] <- NONE
-        end if
-    end for
-
-    environment.associations <- associations
-end procedure
-\end{lstlisting}
+\begin{algorithm}{Environment-update procedure}
+\label{alg:environment-update}
+\begin{tabular}{@{}r@{\quad}p{0.82\linewidth}@{}}
+1 & Update each RU battery according to its previous status and served-user load. \\
+2 & Apply the selected policy to determine the active and sleep states of feasible RUs. \\
+3 & Regenerate link-quality weights for all in-range RU--user pairs. \\
+4 & Recompute user--RU associations using the eligible active RUs and link-quality weights. \\
+\end{tabular}
+\end{algorithm}
 
 \subsection{Experimental Configuration and Policy Comparison}
 
@@ -121,81 +84,7 @@ The time and energy values in Table~\ref{tab:baseline-configuration} are express
 
 To represent the effect of user load on battery depletion, an active RU incurs a non-zero consumption rate even when it serves no users, because its radio and supporting circuitry must remain powered to maintain availability. Serving the first user is modeled as a transition from an availability-only state to a traffic-bearing state, which introduces additional processing and transmission demand. For two or more served users, the model increases consumption per user in proportion to represent additional scheduling, baseband processing, and transmission activity. The resulting rates therefore distinguish between baseline active operation, the onset of traffic service, and load-dependent energy consumption.
 
-The experiment compares three policies: Always Active, Staggered Active, and Threshold Staggered Active, abbreviated as AA, SA, and TSA, respectively. These policies serve as simple, transparent baselines. AA represents the availability-oriented baseline in which every feasible RU remains active. SA represents a periodic energy-saving strategy in which fixed RU groups alternate between active and sleep states every 10 time steps. TSA represents a hybrid strategy that begins with all feasible RUs active and introduces staggered sleeping only after battery capacities reach the configured threshold. Algorithms~\ref{alg:always-active}, \ref{alg:staggered-active}, and~\ref{alg:threshold-staggered-active} summarize the logic of AA, SA, and TSA policies.
-
-\begin{lstlisting}[style=pseudocode, caption={Always Active policy logic.}, label={alg:always-active}]
-procedure ALWAYS_ACTIVE(rus, timestamp)
-    for each ru in rus do
-        SET_SELECTED_STATUS(ru)
-    end for
-
-    return rus
-end procedure
-\end{lstlisting}
-
-\begin{lstlisting}[style=pseudocode, caption={Staggered Active policy logic.}, label={alg:staggered-active}]
-procedure STAGGERED_ACTIVE(rus, timestamp)
-    selected_parity <- floor(timestamp / 10) mod 2
-
-    for each ru in rus do
-        if ru.id mod 2 = selected_parity then
-            SET_SELECTED_STATUS(ru)
-        else
-            ru.status <- SLEEP
-        end if
-    end for
-
-    return rus
-end procedure
-\end{lstlisting}
-
-\begin{lstlisting}[style=pseudocode, caption={Threshold Staggered Active policy logic.}, label={alg:threshold-staggered-active}]
-procedure THRESHOLD_STAGGERED_ACTIVE(
-    rus,
-    timestamp,
-    threshold_percentage,
-    staggered_started
-)
-
-    if rus is empty then
-        return rus
-    end if
-
-    if not staggered_started then
-        threshold_reached <- TRUE
-
-        for each ru in rus do
-            battery_percentage <-
-                100 * ru.battery / ru.initial_battery
-
-            if battery_percentage > threshold_percentage then
-                threshold_reached <- FALSE
-                break
-            end if
-        end for
-
-        if threshold_reached then
-            staggered_started <- TRUE
-        end if
-    end if
-
-    selected_parity <- floor(timestamp / 10) mod 2
-
-    for each ru in rus do
-        if not staggered_started then
-            SET_SELECTED_STATUS(ru)
-
-        else if ru.id mod 2 = selected_parity then
-            SET_SELECTED_STATUS(ru)
-
-        else
-            ru.status <- SLEEP
-        end if
-    end for
-
-    return rus, staggered_started
-end procedure
-\end{lstlisting}
+The experiment compares three policies: Always Active, Staggered Active, and Threshold Staggered Active, abbreviated as AA, SA, and TSA, respectively. These policies serve as simple, transparent baselines. AA represents the availability-oriented baseline in which every feasible RU remains active. SA represents a periodic energy-saving strategy in which fixed RU groups alternate between active and sleep states every 10 time steps. TSA represents a hybrid strategy that begins with all feasible RUs active and introduces staggered sleeping only after battery capacities reach the configured threshold. Their decision rules are defined in Section~\ref{sec:system-model}.
 
 These policies serve as reference points for assessing whether straightforward sleep scheduling can preserve emergency service while extending battery availability in real-world scenarios. They are not intended as optimal outage-management strategies. Accordingly, the comparison examines the limitations and trade-offs of simple policy logic and assesses whether a more sophisticated policy is necessary.
 
