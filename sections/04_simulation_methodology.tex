@@ -1,3 +1,10 @@
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=\textwidth]{simulator-architecture}
+    \caption{Simulator architecture and information flow. The simulation controller coordinates the environment, RU controller, and metric collectors at each timestep.}
+    \label{fig:simulator-architecture}
+\end{figure*}
+
 \section{Simulation Methodology}
 \label{sec:simulation-methodology}
 
@@ -12,12 +19,6 @@ Section~\ref{sec:simulation-architecture} describes the simulator architecture a
 
 The simulator comprises an environment, an RU controller, and metric collectors. The environment maintains the map, RU and user entities, their locations, the connectivity graph, and the current user--RU associations. The controller applies one of the evaluated sleep policies at each timestep. Metric collectors observe the resulting state without influencing the simulation. Figure~\ref{fig:simulator-architecture} depicts the simulator's overall architecture.
 
-\begin{figure*}[t]
-    \centering
-    \includegraphics[width=\textwidth]{simulator-architecture}
-    \caption{Simulator architecture and information flow. The simulation controller coordinates the environment, RU controller, and metric collectors at each timestep.}
-    \label{fig:simulator-architecture}
-\end{figure*}
 
 Each simulation run begins at timestamp \(t=0\), when the simulator constructs the environment, generates initial link-quality values, establishes user--RU associations, and records the initial metric observations. The simulation then executes 100 unit-duration timesteps. During each timestep, the simulator first updates RU batteries based on their preceding state and user load. It then applies the selected policy, regenerates link-quality values, recomputes user associations, and records the resulting metrics. This sequence ensures that battery consumption at timestamp \(t\) is determined by the RU state and user associations observed at timestamp \(t-1\), as described in Section~\ref{sec:system-model}.
 
