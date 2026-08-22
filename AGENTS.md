@@ -53,10 +53,10 @@ formatting.
 - `figures/`: figures and plots.
 - `tables/`: table sources if needed.
 - `sections/01_introduction.tex`
-- `sections/02_background_related_work.tex`
+- `sections/02_related_work.tex`
 - `sections/03_system_model_policies.tex`
 - `sections/04_simulation_methodology.tex`
-- `sections/05_discussion.tex`
+- `sections/05_simulation_discussion.tex`
 - `sections/06_conclusion.tex`
 
 Section filenames should keep numeric prefixes matching the report order.
@@ -74,7 +74,7 @@ The report should remain a minimal six-section conference-style paper:
 7. References
 
 The user's latest preference changed Section 5 from "Results and Discussion" to
-"Discussion". Keep the file and heading as `05_discussion.tex` and
+"Discussion". Keep the file and heading as `05_simulation_discussion.tex` and
 `\section{Discussion}` unless the user asks otherwise.
 
 ## Abstract Expectations
@@ -298,4 +298,3 @@ measurements or evaluating adaptive scheduling policies.
   documentation once sources are selected.
 - Place figures in `figures/` and table sources in `tables/`.
 - Rebuild with `make` after structural LaTeX changes.
-
