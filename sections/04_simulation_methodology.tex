@@ -5,9 +5,10 @@ We developed an open-source custom discrete-time simulator in Python to evaluate
 
 Several established platforms for cellular network simulation exist, but they offer capabilities beyond this study's requirements and introduce unnecessary complexity. For example, 5G-LENA and Simu5G support detailed cellular-network simulation \cite{cttc5gLena,simu5g}, while the NIST module models O-RAN-like RIC interactions \cite{nistNrSidelink}. The srsRAN Project provides full-stack 4G and 5G software radio suites \cite{srsran}, and Colosseum, Arena, and POWDER provide emulation or over-the-air testbed capabilities \cite{colosseum,arena,powder}. OpenRAN Gym supports experimentation with AI/ML-based O-RAN applications across such platforms \cite{bonatiOpenRANGym}. We did not select these platforms because, to the best of our knowledge, replicating the abstract outage, battery, and association model used in this study would require substantial additional configuration and calibration, without directly benefiting the policy-level comparison. The implemented simulator instead offers a transparent and reproducible environment in which the evaluated policy is the primary experimental variable. This simulator is used exclusively for controlled, policy-level comparisons within the simplified model described in Section~\ref{sec:system-model}. The findings are constrained by the specific assumptions and procedures defined in the study and do not substitute for physical-layer simulation or real-world testing.
 
-The following subsections describe the simulation procedure, experimental configuration, and measurement process.
+Section~\ref{sec:simulation-architecture} describes the simulator architecture and execution procedure. Section~\ref{sec:experimental-configuration} presents the experimental configuration and policy comparison. Section~\ref{sec:metrics-analysis} defines the metrics, analysis procedure, and implementation-verification checks.
 
 \subsection{Simulation Architecture and Execution}
+\label{sec:simulation-architecture}
 
 The simulator comprises an environment, an RU controller, and metric collectors. The environment maintains the map, RU and user entities, their locations, the connectivity graph, and the current user--RU associations. The controller applies one of the evaluated sleep policies at each timestep. Metric collectors observe the resulting state without influencing the simulation. Figure~\ref{fig:simulator-architecture} depicts the simulator's overall architecture.
 
@@ -46,6 +47,7 @@ Algorithm~\ref{alg:simulation-execution} summarizes the simulation control proce
 \end{algorithm}
 
 \subsection{Experimental Configuration and Policy Comparison}
+\label{sec:experimental-configuration}
 
 Table~\ref{tab:baseline-configuration} summarises the baseline configuration used in every simulation run. The simulation uses a \(20\times20\) discrete grid containing five RUs and thirty users. Entity locations are sampled uniformly without replacement, such that no two entities occupy the same cell. Users and RUs remain stationary for the duration of a run.
 
@@ -91,6 +93,7 @@ These policies serve as reference points for assessing whether straightforward s
 To increase the generalizability of final results, we conduct multiple simulation repetitions using different seed values. Within each repetition, all three policies use the same seed, ensuring identical RU and user placements and the same sequence of stochastic link-quality values. This paired design reduces the influence of random topology and link variation on the comparison, isolating the selected policy as the intended experimental factor while ensuring the policy is tested across multiple RU and user placements and stochastic link-quality values.
 
 \subsection{Metrics, Analysis Procedure, and Implementation Verification}
+\label{sec:metrics-analysis}
 
 As shown in Figure~\ref{fig:simulator-architecture}, the simulator records observations at timestamp \(t=0\) and after each of the 100 timestep updates. The collected metrics are the served-user fraction over time, average emergency QoS, RU battery-depletion time, and network lifetime.
 
