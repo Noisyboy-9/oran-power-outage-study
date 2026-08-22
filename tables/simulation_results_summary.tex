@@ -1,0 +1,17 @@
+\begin{table*}[!t]
+    \caption{Final metrics across ten paired simulation repetitions. Values are median [Q1--Q3].}
+    \label{tab:simulation-results-summary}
+    \centering
+    \scriptsize
+    \setlength{\tabcolsep}{3pt}
+    \renewcommand{\arraystretch}{1.1}
+    \begin{tabular}{p{0.48\textwidth} c c c}
+        \hline
+        \textbf{Final metric (median [Q1--Q3], 10 paired runs)} & \textbf{AA} & \textbf{SA} & \textbf{TSA} \\
+        \hline
+        Horizon-average QoS & 0.281 [0.280--0.283] & 0.268 [0.266--0.270] & 0.278 [0.276--0.280] \\
+        Mean RU depletion time (simulation steps) & 31.2 [30.2--34.6] & 46.2 [43.8--51.5] & 33.4 [32.2--38.1] \\
+        Network lifetime at SLA $0.7$ (simulation steps) & 21.0 [16.0--24.8] & 0.0 [0.0--17.3] & 20.5 [16.0--22.5] \\
+        \hline
+    \end{tabular}
+\end{table*}
