@@ -1,0 +1,12 @@
+\begin{algorithm}{Simulation execution procedure}
+\label{alg:simulation-execution}
+\begin{tabular}{@{}r@{\quad}p{0.82\linewidth}@{}}
+1 & \textbf{Initialize} the environment, selected controller, and metric collectors. \\
+2 & Set \(t \leftarrow 0\) and record the initial metric observations. \\
+3 & \textbf{for} \(t \leftarrow 1\) \textbf{to} \(K\) \textbf{do} \\
+4 & \quad Update the environment at timestamp \(t\). \\
+5 & \quad Record metric observations at timestamp \(t\). \\
+6 & \textbf{end for} \\
+7 & Finalize and store the metric results. \\
+\end{tabular}
+\end{algorithm}

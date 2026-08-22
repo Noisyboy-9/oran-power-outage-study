@@ -1,0 +1,9 @@
+\begin{algorithm}{Environment-update procedure}
+\label{alg:environment-update}
+\begin{tabular}{@{}r@{\quad}p{0.82\linewidth}@{}}
+1 & Update each RU battery from its previous status and served-user load using \eqref{eq:ru-consumption} and \eqref{eq:battery-update}. \\
+2 & Apply the selected policy to determine active and sleep states; use \eqref{eq:staggered-policy} for SA and \eqref{eq:threshold-trigger} for TSA. \\
+3 & Regenerate link-quality weights for all in-range RU--user pairs using \eqref{eq:link-quality}. \\
+4 & Recompute user--RU associations from eligible active RUs and link-quality weights; update RU loads using \eqref{eq:ru-load}. \\
+\end{tabular}
+\end{algorithm}

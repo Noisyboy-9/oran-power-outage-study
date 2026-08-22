@@ -23,28 +23,9 @@ Each simulation run begins at timestamp \(t=0\), when the simulator constructs t
 
 Algorithm~\ref{alg:simulation-execution} summarizes the simulation control procedure. Algorithm~\ref{alg:environment-update} outlines the environment-update procedure, whose individual actions correspond to the battery, policy, link-quality, and association models defined in Section~\ref{sec:system-model}.
 
-\begin{algorithm}{Simulation execution procedure}
-\label{alg:simulation-execution}
-\begin{tabular}{@{}r@{\quad}p{0.82\linewidth}@{}}
-1 & \textbf{Initialize} the environment, selected controller, and metric collectors. \\
-2 & Set \(t \leftarrow 0\) and record the initial metric observations. \\
-3 & \textbf{for} \(t \leftarrow 1\) \textbf{to} \(K\) \textbf{do} \\
-4 & \quad Update the environment at timestamp \(t\). \\
-5 & \quad Record metric observations at timestamp \(t\). \\
-6 & \textbf{end for} \\
-7 & Finalize and store the metric results. \\
-\end{tabular}
-\end{algorithm}
+\input{algorithms/simulation_execution}
 
-\begin{algorithm}{Environment-update procedure}
-\label{alg:environment-update}
-\begin{tabular}{@{}r@{\quad}p{0.82\linewidth}@{}}
-1 & Update each RU battery from its previous status and served-user load using \eqref{eq:ru-consumption} and \eqref{eq:battery-update}. \\
-2 & Apply the selected policy to determine active and sleep states; use \eqref{eq:staggered-policy} for SA and \eqref{eq:threshold-trigger} for TSA. \\
-3 & Regenerate link-quality weights for all in-range RU--user pairs using \eqref{eq:link-quality}. \\
-4 & Recompute user--RU associations from eligible active RUs and link-quality weights; update RU loads using \eqref{eq:ru-load}. \\
-\end{tabular}
-\end{algorithm}
+\input{algorithms/environment_update}
 
 \subsection{Experimental Configuration and Policy Comparison}
 \label{sec:experimental-configuration}
