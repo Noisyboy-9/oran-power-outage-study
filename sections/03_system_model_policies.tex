@@ -25,6 +25,7 @@ sampled synthetic link weight:
 \begin{equation}
  w_{u,r}(t)=\left(1-\frac{d_{u,r}}{\rho}\right)\xi_{u,r}(t),
  \qquad \xi_{u,r}(t)\in(0,1].
+ \label{eq:link-quality}
 \end{equation}
 The normalized score \(w_{u,r}(t)\) is the simulator's proxy for real-world
 SINR behavior, not a calculated physical SINR value.  Its deterministic
@@ -46,6 +47,7 @@ exclusive, so \(\sum_{r\in R}a_{u,r}(t)\leq1\): a user has one serving RU or
 none.  The load on RU \(r\) is
 \begin{equation}
  n_r(t)=\sum_{u\in U}a_{u,r}(t), \qquad n_r(t)\leq C_r,
+ \label{eq:ru-load}
 \end{equation}
 where \(C_r\) is its user capacity. 
 
@@ -85,10 +87,12 @@ consumption implied by the preceding state and association is
  P_1, & x_r(t-1)=\mathrm{A},\ n_r(t-1)=1,\\
  n_r(t-1)P_m, & x_r(t-1)=\mathrm{A},\ n_r(t-1)\geq2.
  \end{cases}
+ \label{eq:ru-consumption}
 \end{equation}
 For a unit-duration time step, battery discharge is clamped at zero:
 \begin{equation}
  b_r(t)=\max\{0,b_r(t-1)-c_r(t-1)\}.
+ \label{eq:battery-update}
 \end{equation}
 The state \(x_r(0)\) is the configured initial state, and initial associations
 are observed at \(t=0\).  
@@ -119,6 +123,7 @@ timestamp.
 The \emph{StaggeredActive} policy selects RU \(r\) exactly when
 \begin{equation}
  r\bmod2=\left\lfloor\frac{t}{10}\right\rfloor\bmod2,
+ \label{eq:staggered-policy}
 \end{equation}
 at controller timestamp \(t\).  Thus, even-ID RUs are selected when
 \(\lfloor t/10\rfloor\bmod2=0\), whereas odd-ID RUs are selected otherwise;
@@ -131,6 +136,7 @@ is the first controller timestamp at which every RU satisfies
 \begin{equation}
  \tau=\min\left\{t\in\{1,\ldots,K\}:b_r(t)\leq
  \frac{\theta}{100}b_r^0\ \text{for all}\ r\in R\right\}.
+ \label{eq:threshold-trigger}
 \end{equation}
 At every \(t\in\{\tau,\ldots,K\}\), including \(t=\tau\), it applies the
 \emph{StaggeredActive} rule using the same global timestamp, rather than
