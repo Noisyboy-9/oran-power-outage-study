@@ -32,36 +32,7 @@ Algorithm~\ref{alg:simulation-execution} summarizes the simulation control proce
 
 Table~\ref{tab:baseline-configuration} summarises the baseline configuration used in every simulation run. The simulation uses a \(20\times20\) discrete grid containing five RUs and thirty users. Entity locations are sampled uniformly without replacement, such that no two entities occupy the same cell. Users and RUs remain stationary for the duration of a run.
 
-\begin{table}[t]
-    \caption{Baseline simulation configuration.}
-    \label{tab:baseline-configuration}
-    \centering
-    \footnotesize
-    \setlength{\tabcolsep}{3pt}
-    \renewcommand{\arraystretch}{1.1}
-    \begin{tabular}{p{0.62\columnwidth} p{0.32\columnwidth}}
-        \hline
-        \textbf{Parameter} & \textbf{Value} \\
-        \hline
-        Simulation & \(20\times20\) grid cells \\
-        Number of RUs & 5 \\
-        Number of users & 30 \\
-        Initial RU battery & 250 energy units \\
-        Initial RU status & Active \\
-        Active RU with zero users battery consumption & 1.0 energy units per step \\
-        Active RU with one user battery consumption & 2.0 energy units per step \\
-        Active RU with two or more users battery consumption & 1.5 energy units per user per step \\
-        Sleep consumption & 0.5 energy units per step \\
-        RU user capacity & 100 users \\
-        Coverage radius & 8 grid cells \\
-        Simulation horizon & 100 timesteps \\
-        Staggered-policy interval & 10 timesteps \\
-        Threshold-policy trigger & 50\% of initial battery \\
-        Emergency QoS target & 0.7 \\
-        Number of simulation repetitions & 10 \\
-        \hline
-    \end{tabular}
-\end{table}
+\input{tables/baseline_simulation_configuration}
 
 The time and energy values in Table~\ref{tab:baseline-configuration} are expressed in simulation units. They are not interpreted as seconds, minutes, Joules, or measured hardware power values. This approach enables explicit modeling of energy consumption for policy comparison without implying a direct mapping to a specific RU implementation.
 
