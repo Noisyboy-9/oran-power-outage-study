@@ -100,10 +100,10 @@ A controller can activate a selected RU only when \(b_r(t)\geq P_0\); otherwise 
 \subsection{Evaluated Policies}
 
 The simulator implements and compares three deterministic policies:
-\emph{AlwaysActive}, \emph{StaggeredActive}, and
-\emph{ThresholdStaggeredActive}.  \emph{AlwaysActive} keeps all feasible RUs
-active, \emph{StaggeredActive} alternates fixed RU groups, and
-\emph{ThresholdStaggeredActive} begins with all RUs selected before switching
+\emph{Always Active}, \emph{Staggered Active}, and
+\emph{Threshold Staggered Active}.  \emph{Always Active} keeps all feasible RUs
+active, \emph{Staggered Active} alternates fixed RU groups, and
+\emph{Threshold Staggered Active} begins with all RUs selected before switching
 to the same staggered schedule after a battery-based trigger.
 
 All policies use the same placement, link-weight, association, and battery
@@ -112,10 +112,10 @@ selects the RUs intended to be active; the activation condition specified
 above still prevents a selected RU with insufficient battery energy from
 becoming active.
 
-The baseline \emph{AlwaysActive} policy selects every RU at every controller
+The baseline \emph{Always Active} policy selects every RU at every controller
 timestamp.
 
-The \emph{StaggeredActive} policy selects RU \(r\) exactly when
+The \emph{Staggered Active} policy selects RU \(r\) exactly when
 \begin{equation}
  r\bmod2=\left\lfloor\frac{t}{10}\right\rfloor\bmod2,
  \label{eq:staggered-policy}
@@ -125,7 +125,7 @@ at controller timestamp \(t\).  Thus, even-ID RUs are selected when
 the other group sleeps.  The policy uses the global timestamp to alternate
 between the two groups in consecutive 10-timestamp intervals.
 
-The \emph{ThresholdStaggeredActive} policy follows \emph{AlwaysActive} until
+The \emph{Threshold Staggered Active} policy follows \emph{Always Active} until
 the battery trigger occurs.  When it exists, the trigger timestamp \(\tau\)
 is the first controller timestamp at which every RU satisfies
 \begin{equation}
@@ -134,7 +134,7 @@ is the first controller timestamp at which every RU satisfies
  \label{eq:threshold-trigger}
 \end{equation}
 At every \(t\in\{\tau,\ldots,K\}\), including \(t=\tau\), it applies the
-\emph{StaggeredActive} rule using the same global timestamp, rather than
+\emph{Staggered Active} rule using the same global timestamp, rather than
 restarting the schedule.  If no such \(\tau\) occurs, the policy selects all
 RUs at every controller timestamp.
 
