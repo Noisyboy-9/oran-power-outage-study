@@ -58,7 +58,7 @@ RU that is active, non-depleted, and not full; otherwise the user remains
 unassociated.  The complete association map is recomputed independently at
 every observation timestamp; associations are neither sticky nor persistent
 across time steps.  The simulator models no handover hysteresis or minimum
-residence time.  Therefore, a user served by one RU at \(t-1\) maybe assigned
+residence time.  Therefore, a user served by one RU at \(t-1\) may be assigned
 to another at \(t\) when that RU ranks first among the newly ordered eligible
 candidates. Such re-association incurs no modeled delay, temporary service interruption, or
 additional energy cost.  
@@ -145,7 +145,7 @@ RUs at every controller timestamp.
 
 \subsection{Observed Metrics}
 
-We have defined QoS is as the proportion of users receiving service at
+QoS is defined as the proportion of users receiving service at
 timestamp \(t\):
 \begin{equation}
  \mathrm{QoS}(t)=\frac{1}{|U|}\sum_{u\in U}y_u(t).
