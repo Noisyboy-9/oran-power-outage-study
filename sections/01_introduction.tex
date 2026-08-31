@@ -9,7 +9,7 @@ therefore critical: an RU that depletes its battery can no longer provide radio
 access to users within its coverage area~\cite{oranScArchitecture}.
 
 This scenario implies a fundamental trade-off between energy consumption and
-service availability. Keeping all RUs active maximizes connectivity but
+service availability. Keeping all RUs active maximizes coverage but
 accelerates battery depletion. In contrast, placing selected RUs into a
 low-power sleep state conserves energy and extends battery availability,
 though it may reduce the proportion of users served. Sleep-mode mechanisms are
@@ -34,23 +34,26 @@ controlled, policy-level simulation study rather than a proposal for an optimal
 scheduling algorithm, a physical-layer-accurate analysis, or a validation of a
 specific hardware deployment.
 
-Through this work, we propose four main contributions:
+This work makes four main contributions:
 \begin{itemize}
-    \item We develop a modular, discrete-time simulation system for evaluating
-    RU operating policies during power outages. This system separates policy
-    decisions from the network environment, simulation execution procedure, and
-    metric collection, enabling alternative RU control policies to be
-    incorporated and compared within a common, reproducible experimental
-    setting.
-    \item We define a simplified outage model that combines RU battery
-    depletion, active and sleep states, stochastic link quality,
-    capacity-constrained user association, and emergency-service metrics.
-    \item We comparatively evaluate the three predefined policies through paired
-    simulation repetitions, using emergency QoS, RU battery-depletion time, and
+    \item We formulate a simplified, scenario-specific model of an O-RAN power
+    outage that captures RU battery depletion, active and sleep states,
+    stochastic link quality, capacity-constrained user association, and
+    emergency-service measures.
+    \item We conducted controlled simulations of three predefined RU operating
+    policies: Always Active, Staggered Active, and Threshold Staggered Active.
+    The evaluation considers emergency QoS, RU battery-depletion time, and
     SLA-based network lifetime as complementary measures.
-    \item We assess, within the stated model and configuration, whether simple
-    sleep schedules provide an adequate emergency-service trade-off and where
-    more flexible policy design is warranted.
+    \item Within the stated model configuration, results show that extending RU
+    battery lifetime does not always ensure reliable emergency service.
+    Periodic staggering maximizes battery extension but often fails to meet the
+    service target early. In contrast, threshold-triggered staggering maintains
+    the service lifetime of the Always Active policy, but offers only a modest
+    battery benefit.
+    \item To perform our evaluations, we developed a modular, discrete-time
+    simulation system. This simulator separates policy decisions from the
+    network environment, execution procedure, and metric collection, enabling
+    reproducible comparison of alternative RU control policies.
 \end{itemize}
 
 The results show that the battery benefits of predefined sleep policies do not
