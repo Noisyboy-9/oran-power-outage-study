@@ -2,78 +2,42 @@
 \label{sec:system-model}
 \subsection{Network and Link-Quality Model}
 
-The outage starts before the first time step and lasts for a horizon of
-\(K\) unit-duration time steps.  Let \(U\) and \(R\) denote the sets of users
-and Radio Units (RUs), respectively.  Users and RUs are stationary, and their locations are
-sampled uniformly at random without replacement from the cells of a discrete
-\(W\times H\) grid.  Consequently, no two entities occupy the same cell.  With
-locations \(p_u=(x_u,y_u)\) and
-\(p_r=(x_r,y_r)\), their Euclidean distance is
+The outage starts before the first time step and lasts for a horizon of \(K\) unit-duration time steps.  Let \(U\) and \(R\) denote the sets of users and Radio Units (RUs), respectively.  Users and RUs are stationary, and their locations are sampled uniformly at random without replacement from the cells of a discrete \(W\times H\) grid.  Consequently, no two entities occupy the same cell.  With locations \(p_u=(x_u,y_u)\) and \(p_r=(x_r,y_r)\), their Euclidean distance is
+
 \begin{equation}
  d_{u,r}=\sqrt{(x_u-x_r)^2+(y_u-y_r)^2}.
 \end{equation}
-An in-range bipartite edge exists only when \(d_{u,r}<\rho\), where \(\rho\)
-is the coverage radius.  This in-range topology is fixed during a run.
+An in-range bipartite edge exists only when \(d_{u,r}<\rho\), where \(\rho\) is the coverage radius.  This in-range topology is fixed during a run.
 
-At every observation timestamp \(t\), each in-range edge receives a newly
-sampled synthetic link weight:
+At every observation timestamp \(t\), each in-range edge receives a newly sampled synthetic link weight:
 \begin{equation}
  w_{u,r}(t)=\left(1-\frac{d_{u,r}}{\rho}\right)\xi_{u,r}(t),
  \qquad \xi_{u,r}(t)\in(0,1].
  \label{eq:link-quality}
 \end{equation}
-The normalized score \(w_{u,r}(t)\) is the simulator's proxy for real-world
-SINR behavior, not a calculated physical SINR value.  Its deterministic
-factor \((1-d_{u,r}/\rho)\) represents expected link deterioration with
-distance: nearby pairs have greater baseline quality, which approaches zero
-as the coverage boundary is approached.  Independently at each observation,
-\(\xi_{u,r}(t)\) is sampled uniformly at random from \((0,1]\).  This factor
-represents temporal variation that can make real SINR fluctuate even for
-stationary users, such as changing channel or interference conditions,
-without explicitly computing those mechanisms.  The inclusive threshold
-\(\lambda\in[0,1]\) gives the eligibility rule in plain terms: an in-range
-link with \(w_{u,r}(t)\geq\lambda\) will be considered for association, whereas
-a link below \(\lambda\) will not.  
+The normalized score \(w_{u,r}(t)\) is the simulator's proxy for real-world SINR behavior, not a calculated physical SINR value.  Its deterministic factor \((1-d_{u,r}/\rho)\) represents expected link deterioration with distance: nearby pairs have greater baseline quality, which approaches zero as the coverage boundary is approached.  Independently at each observation, \(\xi_{u,r}(t)\) is sampled uniformly at random from \((0,1]\).  This factor represents temporal variation that can make real SINR fluctuate even for stationary users, such as changing channel or interference conditions, without explicitly computing those mechanisms.  The inclusive threshold \(\lambda\in[0,1]\) gives the eligibility rule in plain terms: an in-range link with \(w_{u,r}(t)\geq\lambda\) will be considered for association, whereas a link below \(\lambda\) will not.
 
 \subsection{Association and Outage Assumptions}
 
-Let \(a_{u,r}(t)\in\{0,1\}\) be the association decision.  Associations are
-exclusive, so \(\sum_{r\in R}a_{u,r}(t)\leq1\): a user has one serving RU or
-none.  The load on RU \(r\) is
+Let \(a_{u,r}(t)\in\{0,1\}\) be the association decision.  Associations are exclusive, so \(\sum_{r\in R}a_{u,r}(t)\leq1\): a user has one serving RU or none.  The load on RU \(r\) is
 \begin{equation}
  n_r(t)=\sum_{u\in U}a_{u,r}(t), \qquad n_r(t)\leq C_r,
  \label{eq:ru-load}
 \end{equation}
-where \(C_r\) is its user capacity. 
+where \(C_r\) is its user capacity.
 
-For each user in ascending user-ID order, the simulator considers candidates with \(w_{u,r}(t)\geq\lambda\),
-ordered by descending weight and then ascending RU ID.  It scans this ranked
-list and associates the user with the first RU that is active, has positive
-battery energy, and has spare capacity.  If no candidate meets all three
-conditions, the user remains unassociated.  The complete association map is recomputed independently at
-every observation timestamp; associations are neither sticky nor persistent
-across time steps.  The simulator models no handover hysteresis or minimum
-residence time.  Therefore, a user served by one RU at \(t-1\) may be assigned
-to another at \(t\) when that RU ranks first among the newly ordered eligible
-candidates. Such re-association incurs no modeled delay, temporary service interruption, or
-additional energy cost.  
+For each user in ascending user-ID order, the simulator considers candidates with \(w_{u,r}(t)\geq\lambda\), ordered by descending weight and then ascending RU ID.  It scans this ranked list and associates the user with the first RU that is active, has positive battery energy, and has spare capacity.  If no candidate meets all three conditions, the user remains unassociated.  The complete association map is recomputed independently at every observation timestamp; associations are neither sticky nor persistent across time steps.  The simulator models no handover hysteresis or minimum residence time.  Therefore, a user served by one RU at \(t-1\) may be assigned to another at \(t\) when that RU ranks first among the newly ordered eligible candidates. Such re-association incurs no modeled delay, temporary service interruption, or additional energy cost.
 
-Service is therefore defined by association rather
-than merely by an in-range edge:
+Service is therefore defined by association rather than merely by an in-range edge:
 \begin{equation}
  y_u(t)=\sum_{r\in R}a_{u,r}(t).
 \end{equation}
 
-The outage affects the RUs, whose initial battery energies are \(b_r^0\).
-There is no recharge, recovery, or state-switching time or energy cost.  An
-RU is depleted when its battery is zero and cannot serve users.
+The outage affects the RUs, whose initial battery energies are \(b_r^0\). There is no recharge, recovery, or state-switching time or energy cost.  An RU is depleted when its battery is zero and cannot serve users.
 
 \subsection{Battery Model and State Transitions}
 
-Let \(b_r(t)\) be the battery after the update at timestamp \(t\), and let
-\(x_r(t)\in\{\mathrm{S},\mathrm{A}\}\) be its observed sleep or active state.
-With positive consumption rates \(P_s\), \(P_0\), \(P_1\), and \(P_m\), the
-consumption implied by the preceding state and association is
+Let \(b_r(t)\) be the battery after the update at timestamp \(t\), and let \(x_r(t)\in\{\mathrm{S},\mathrm{A}\}\) be its observed sleep or active state. With positive consumption rates \(P_s\), \(P_0\), \(P_1\), and \(P_m\), the consumption implied by the preceding state and association is
 \begin{equation}
  c_r(t-1)=
  \begin{cases}
@@ -83,71 +47,45 @@ consumption implied by the preceding state and association is
  n_r(t-1)P_m, & x_r(t-1)=\mathrm{A},\ n_r(t-1)\geq2.
  \end{cases}
  \label{eq:ru-consumption}
-\end{equation}
-For a unit-duration time step, battery discharge is clamped at zero:
+\end{equation} For a unit-duration time step, battery discharge is clamped at zero:
 \begin{equation}
  b_r(t)=\max\{0,b_r(t-1)-c_r(t-1)\}.
  \label{eq:battery-update}
 \end{equation}
-The state \(x_r(0)\) is the configured initial state, and initial associations
-are observed at \(t=0\).  
+The state \(x_r(0)\) is the configured initial state, and initial associations are observed at \(t=0\).
 
-For each \(t=1,\ldots,K\), the simulator reduces the battery capacities
-according to the preceding status and associations, applies the policy decisions, 
-regenerates link weights, rebuilds associations, and then observes metrics.  
-A controller can activate a selected RU only when \(b_r(t)\geq P_0\); otherwise it is sleep.
+For each \(t=1,\ldots,K\), the simulator reduces the battery capacities according to the preceding status and associations, applies the policy decisions,  regenerates link weights, rebuilds associations, and then observes metrics.   A controller can activate a selected RU only when \(b_r(t)\geq P_0\); otherwise it is sleep.
 
 \subsection{Evaluated Policies}
 
-The simulator implements and compares three deterministic policies:
-\emph{Always Active}, \emph{Staggered Active}, and
-\emph{Threshold Staggered Active}.  \emph{Always Active} keeps all feasible RUs
-active, \emph{Staggered Active} alternates fixed RU groups, and
-\emph{Threshold Staggered Active} begins with all RUs selected before switching
-to the same staggered schedule after a battery-based trigger.
+The simulator implements and compares three deterministic policies: \emph{Always Active}, \emph{Staggered Active}, and \emph{Threshold Staggered Active}.  \emph{Always Active} keeps all feasible RUs active, \emph{Staggered Active} alternates fixed RU groups, and \emph{Threshold Staggered Active} begins with all RUs selected before switching to the same staggered schedule after a battery-based trigger.
 
-All policies use the same placement, link-weight, association, and battery
-models.  At each controller timestamp \(t\in\{1,\ldots,K\}\), a policy
-selects the RUs intended to be active; the activation condition specified
-above still prevents a selected RU with insufficient battery energy from
-becoming active.
+All policies use the same placement, link-weight, association, and battery models.  At each controller timestamp \(t\in\{1,\ldots,K\}\), a policy selects the RUs intended to be active; the activation condition specified above still prevents a selected RU with insufficient battery energy from becoming active.
 
-The baseline \emph{Always Active} policy selects every RU at every controller
-timestamp.
+The baseline \emph{Always Active} policy selects every RU at every controller timestamp.
 
 The \emph{Staggered Active} policy selects RU \(r\) exactly when
 \begin{equation}
  r\bmod2=\left\lfloor\frac{t}{10}\right\rfloor\bmod2,
  \label{eq:staggered-policy}
 \end{equation}
-at controller timestamp \(t\).  Thus, even-ID RUs are selected when
-\(\lfloor t/10\rfloor\bmod2=0\), whereas odd-ID RUs are selected otherwise;
-the other group sleeps.  The policy uses the global timestamp to alternate
-between the two groups in consecutive 10-timestamp intervals.
+at controller timestamp \(t\).  Thus, even-ID RUs are selected when \(\lfloor t/10\rfloor\bmod2=0\), whereas odd-ID RUs are selected otherwise; the other group sleeps.  The policy uses the global timestamp to alternate between the two groups in consecutive 10-timestamp intervals.
 
-The \emph{Threshold Staggered Active} policy follows \emph{Always Active} until
-the battery trigger occurs.  When it exists, the trigger timestamp \(\tau\)
-is the first controller timestamp at which every RU satisfies
+The \emph{Threshold Staggered Active} policy follows \emph{Always Active} until the battery trigger occurs.  When it exists, the trigger timestamp \(\tau\) is the first controller timestamp at which every RU satisfies
 \begin{equation}
  \tau=\min\left\{t\in\{1,\ldots,K\}:b_r(t)\leq
  \frac{\theta}{100}b_r^0\ \text{for all}\ r\in R\right\}.
  \label{eq:threshold-trigger}
 \end{equation}
-At every \(t\in\{\tau,\ldots,K\}\), including \(t=\tau\), it applies the
-\emph{Staggered Active} rule using the same global timestamp, rather than
-restarting the schedule.  If no such \(\tau\) occurs, the policy selects all
-RUs at every controller timestamp.
+At every \(t\in\{\tau,\ldots,K\}\), including \(t=\tau\), it applies the \emph{Staggered Active} rule using the same global timestamp, rather than restarting the schedule.  If no such \(\tau\) occurs, the policy selects all RUs at every controller timestamp.
 
 \subsection{Observed Metrics}
 
-emergency QoS is defined as the proportion of users receiving service at
-timestamp \(t\):
+emergency QoS is defined as the proportion of users receiving service at timestamp \(t\):
 \begin{equation}
  \mathrm{QoS}(t)=\frac{1}{|U|}\sum_{u\in U}y_u(t).
 \end{equation}
-It ranges from zero, when no user is associated, to one, when all users are
-associated.  The average emergency QoS over the simulation horizon includes
-all \(K+1\) observations:
+It ranges from zero, when no user is associated, to one, when all users are associated.  The average emergency QoS over the simulation horizon includes all \(K+1\) observations:
 \begin{equation}
  \overline{\mathrm{QoS}}=\frac{1}{K+1}\sum_{t=0}^{K}\mathrm{QoS}(t).
 \end{equation}
@@ -158,15 +96,11 @@ The observed battery-depletion time of RU \(r\) is
  \min\{t\in\{0,\ldots,K\}:b_r(t)=0\}, & \text{if observed},\\
  \infty, & \text{otherwise}.
  \end{cases}
-\end{equation}
-For an emergency-service target \(\eta\), the observed network lifetime is
+\end{equation} For an emergency-service target \(\eta\), the observed network lifetime is
 \begin{equation}
  L_\eta=\begin{cases}
  0, & \mathrm{QoS}(0)<\eta,\\
  t^\star-1, & t^\star=\min\{t\in\{1,\ldots,K\}:\mathrm{QoS}(t)<\eta\},\\
  \infty, & \mathrm{QoS}(t)\geq\eta\ \text{for all}\ t\in\{0,\ldots,K\}.
  \end{cases}
-\end{equation}
-Thus, \(D_r\) and \(L_\eta\) are bounded by the observation horizon; a value
-of \(\infty\) means that the corresponding depletion or service-target
-violation was not observed by the end of the simulation.
+\end{equation} Thus, \(D_r\) and \(L_\eta\) are bounded by the observation horizon; a value of \(\infty\) means that the corresponding depletion or service-target violation was not observed by the end of the simulation.
