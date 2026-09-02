@@ -1,11 +1,5 @@
 \section{Related Work}
 
-\subsection{O-RAN Architecture and Power-Outage Context}
-
-O-RAN builds on the disaggregated 5G radio access network architecture in which centralized and distributed processing functions are separated from radio functions. In particular, 3GPP distinguishes Central Unit (CU) and Distributed Unit (DU) functions within the gNB architecture, while O-RAN specifies open and interoperable interfaces and functions around components such as the O-CU, O-DU, and O-RU~\cite{oranArchitecture,3gppTs38401}. The O-RU performs the radio-facing functions that enable wireless access, making its continued operation particularly important for users located within its service area.
-
-In this analysis we consider a network-wide grid-power outage scenario in which the O-RUs operate using finite local battery capacity. The O-CU and O-DU are assumed to retain backup power and are therefore excluded from the modeled energy constraint. This abstraction, while not a complete representation of deployment-level power architecture, enables focused examination of the trade-off at the radio-access edge: maintaining an RU in an active state can sustain user connectivity, but it also depletes the stored energy required to maintain service as the outage persists.
-
 \subsection{Sleep Modes and Energy-Aware Radio Access Management}
 
 Sleep-mode operation has long been studied as a way to reduce the energy consumption of cellular base stations. Works such as ~\cite{wu2015sleep,lopezPerez2022ranEnergy} provide a broad survey of sleep-mode techniques, showing how radio resources can be selectively deactivated when full network capacity is unnecessary. Such techniques are commonly motivated by normal variations in traffic demand, where lightly loaded cells may enter a reduced-power state while nearby active cells absorb their traffic.
