@@ -58,26 +58,26 @@ For each \(t=1,\ldots,K\), the simulator reduces the battery capacities accordin
 
 \subsection{Evaluated Policies}
 
-The simulator implements and compares three deterministic policies: \emph{Always Active}, \emph{Staggered Active}, and \emph{Threshold Staggered Active}.  \emph{Always Active} keeps all feasible RUs active, \emph{Staggered Active} alternates fixed RU groups, and \emph{Threshold Staggered Active} begins with all RUs selected before switching to the same staggered schedule after a battery-based trigger.
+To examine the trade-off between maintaining emergency connectivity and conserving limited battery energy, the evaluation compares three deterministic RU operating policies. \emph{Always Active} serves as an availability-focused baseline by keeping all feasible RUs active. \emph{Staggered Active} reduces energy use proactively by alternating fixed RU groups between active and sleep states. \emph{Threshold Staggered Active} combines these approaches: it initially follows \emph{Always Active} and switches to the same staggered schedule after a battery-based trigger.
 
 All policies use the same placement, link-weight, association, and battery models.  At each controller timestamp \(t\in\{1,\ldots,K\}\), a policy selects the RUs intended to be active; the activation condition specified above still prevents a selected RU with insufficient battery energy from becoming active.
 
 The baseline \emph{Always Active} policy selects every RU at every controller timestamp.
 
-The \emph{Staggered Active} policy selects RU \(r\) exactly when
+The \emph{Staggered Active} policy alternates two fixed RU groups. Let \(T_{\mathrm{SA}}\) denote the number of time steps for which a group remains active before the policy switches to the other group. RU \(r\) is selected at controller timestamp \(t\) exactly when
 \begin{equation}
- r\bmod2=\left\lfloor\frac{t}{10}\right\rfloor\bmod2,
+ r\bmod2=\left\lfloor\frac{t}{T_{\mathrm{SA}}}\right\rfloor\bmod2,
  \label{eq:staggered-policy}
 \end{equation}
-at controller timestamp \(t\).  Thus, even-ID RUs are selected when \(\lfloor t/10\rfloor\bmod2=0\), whereas odd-ID RUs are selected otherwise; the other group sleeps.  The policy uses the global timestamp to alternate between the two groups in consecutive 10-timestamp intervals.
+Thus, even-ID RUs are selected when \(\lfloor t/T_{\mathrm{SA}}\rfloor\bmod2=0\), whereas odd-ID RUs are selected otherwise; the other group sleeps. The policy uses the global timestamp to alternate between the two groups in consecutive \(T_{\mathrm{SA}}\)-timestamp intervals.
 
-The \emph{Threshold Staggered Active} policy follows \emph{Always Active} until the battery trigger occurs.  When it exists, the trigger timestamp \(\tau\) is the first controller timestamp at which every RU satisfies
+The \emph{Threshold Staggered Active} policy delays energy-saving operation to preserve emergency connectivity while battery levels remain relatively high. It follows \emph{Always Active} until every RU has reached or fallen below \(\theta\%\) of its initial battery energy. Formally, the trigger timestamp \(\tau\) is the first controller timestamp at which every RU satisfies
 \begin{equation}
  \tau=\min\left\{t\in\{1,\ldots,K\}:b_r(t)\leq
  \frac{\theta}{100}b_r^0\ \text{for all}\ r\in R\right\}.
  \label{eq:threshold-trigger}
 \end{equation}
-At every \(t\in\{\tau,\ldots,K\}\), including \(t=\tau\), it applies the \emph{Staggered Active} rule using the same global timestamp, rather than restarting the schedule.  If no such \(\tau\) occurs, the policy selects all RUs at every controller timestamp.
+From \(\tau\) onward, including \(t=\tau\), the policy applies the \emph{Staggered Active} rule using the same global timestamp, rather than restarting the schedule. If no such \(\tau\) occurs, the policy selects all RUs at every controller timestamp.
 
 \subsection{Observed Metrics}
 
