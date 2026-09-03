@@ -2,13 +2,9 @@
 \label{sec:system-model}
 \subsection{Network and Link-Quality Model}
 
-The model considers a network-wide grid-power outage in which the O-RUs (hereafter RUs) draw on finite local batteries. The O-CU and O-DU are assumed to remain available through backup power and are therefore excluded from the energy model. This abstraction isolates the RU-level trade-off between energy use and emergency service during the outage.
+We consider a mobile network operator (MNO) that provides cellular coverage over a discrete \(W\times H\) grid through \(N\) O-RUs (hereafter RUs), represented by the set \(R\), where \(|R|=N\). The coverage area contains a set \(U\) of users. A network-wide grid-power outage begins before the first time step, during which the RUs draw on finite local batteries. The O-CU and O-DU are assumed to remain available through backup power and are therefore excluded from the energy model. This abstraction isolates the RU-level trade-off between energy use and emergency service during the outage.
 
-The outage begins before the first time step and lasts for a horizon of \(K\) unit-duration time steps.  Let \(U\) and \(R\) denote the sets of users and RUs, respectively.  Users and RUs are stationary, and their locations are sampled uniformly at random without replacement from the cells of a discrete \(W\times H\) grid.  Consequently, no two entities occupy the same cell.  With locations \(p_u=(x_u,y_u)\) and \(p_r=(x_r,y_r)\), their Euclidean distance is
-
-\begin{equation}
- d_{u,r}=\sqrt{(x_u-x_r)^2+(y_u-y_r)^2}.
-\end{equation}
+The outage lasts for a horizon of \(K\) unit-duration time steps. Users and RUs are stationary, and their locations are sampled uniformly at random without replacement from the cells of the grid. Consequently, no two entities occupy the same cell. For a user \(u\in U\) and an RU \(r\in R\), with locations \(p_u=(x_u,y_u)\) and \(p_r=(x_r,y_r)\), we denote their Euclidean distance by \(d_{u,r}\).
 An in-range bipartite edge exists only when \(d_{u,r}<\rho\), where \(\rho\) is the coverage radius.  This in-range topology is fixed during a run.
 
 At every observation timestamp \(t\), each in-range edge receives a newly sampled synthetic link weight:
