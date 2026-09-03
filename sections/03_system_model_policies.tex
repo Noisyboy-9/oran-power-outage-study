@@ -12,10 +12,10 @@ The outage lasts for a horizon of \(K\) unit-duration time steps. Users and RUs 
 At every observation timestamp \(t\), each in-range edge is assigned a newly sampled synthetic link weight, which serves as a proxy for real-world SINR behavior rather than a calculated physical SINR value:
 \begin{equation}
  w_{u,r}(t)=\left(1-\frac{d_{u,r}}{\rho}\right)\xi_{u,r}(t),
- \qquad \xi_{u,r}(t)\in(0,1].
+ \qquad \xi_{u,r}(t)\in[0,1).
  \label{eq:link-quality}
 \end{equation}
-The deterministic factor \((1-\frac{d_{u,r}}{\rho})\) represents expected link deterioration with distance: nearby pairs have greater baseline quality, which approaches zero as the coverage boundary is approached.  Independently at each observation, \(\xi_{u,r}(t)\) is sampled uniformly at random from \((0,1]\).  This factor represents temporal variation that can make real SINR fluctuate even for stationary users, such as changing channel or interference conditions, without explicitly computing those mechanisms.  The inclusive threshold \(\lambda\in[0,1]\) gives the eligibility rule in plain terms: an in-range link with \(w_{u,r}(t)\geq\lambda\) will be considered for association, whereas a link below \(\lambda\) will not.
+The deterministic factor \((1-\frac{d_{u,r}}{\rho})\) represents expected link deterioration with distance: nearby pairs have greater baseline quality, which approaches zero as the coverage boundary is approached.  Independently at each observation, \(\xi_{u,r}(t)\) is sampled uniformly at random from \([0,1)\).  This factor represents temporal variation that can make real SINR fluctuate even for stationary users, such as changing channel or interference conditions, without explicitly computing those mechanisms.  The inclusive threshold \(\lambda\in[0,1]\) gives the eligibility rule in plain terms: an in-range link with \(w_{u,r}(t)\geq\lambda\) will be considered for association, whereas a link below \(\lambda\) will not.
 
 \subsection{Association and Outage Assumptions}
 
@@ -26,7 +26,7 @@ Let \(a_{u,r}(t)\in\{0,1\}\) denote whether user \(u\) is associated with RU \(r
 \end{equation}
 where \(C_r\) is the maximum number of users that RU \(r\) can serve simultaneously.
 
-At each observation timestamp \(t\), users are considered in ascending user-ID order. For each user \(u\), the candidate RUs are those for which \(w_{u,r}(t)\geq\lambda\). The candidates are ranked by descending link weight and then by ascending RU ID. The user is associated with the highest-ranked candidate that is active, has positive battery energy, and has not reached its maximum simultaneous-user limit. If no candidate meets these conditions, the user remains unassociated. Associations are recomputed independently at every observation timestamp; the model includes no handover hysteresis or minimum residence time. Therefore, a user served by one RU at \(t-1\) may be assigned to another at \(t\) when that RU ranks first among the newly ranked candidates. Such re-association incurs no modeled delay, temporary service interruption, or additional energy cost.
+At each observation timestamp \(t\), users are considered in ascending user-ID order. This order is used only as a deterministic allocation order when RU capacity is contested; it does not represent an operational service-priority scheme. For each user \(u\), the candidate RUs are those for which \(w_{u,r}(t)\geq\lambda\). The candidates are ranked by descending link weight and then by ascending RU ID. The user is associated with the highest-ranked candidate that is active, has positive battery energy, and has not reached its maximum simultaneous-user limit. If no candidate meets these conditions, the user remains unassociated. Associations are recomputed independently at every observation timestamp; the model includes no handover hysteresis or minimum residence time. Therefore, a user served by one RU at \(t-1\) may be assigned to another at \(t\) when that RU ranks first among the newly ranked candidates. Such re-association incurs no modeled delay, temporary service interruption, or additional energy cost.
 
 Service is therefore defined by association rather than merely by an in-range edge:
 \begin{equation}
@@ -47,6 +47,7 @@ Let \(b_r(t)\) be the battery after the update at timestamp \(t\), and let \(x_r
  \end{cases}
  \label{eq:ru-consumption}
 \end{equation}
+These state- and load-dependent values represent total modeled energy consumption per time step and are not calibrated hardware power measurements.
 For a unit-duration time step, battery discharge is clamped at zero:
 \begin{equation}
  b_r(t)=\max\{0,b_r(t-1)-c_r(t-1)\}.
