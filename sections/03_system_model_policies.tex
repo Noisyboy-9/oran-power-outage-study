@@ -1,19 +1,21 @@
 \section{System Model and Evaluated Policies}
 \label{sec:system-model}
+
+This section defines the network-wide outage model used to evaluate the predefined RU operating policies. It first specifies the network, link-quality, and association assumptions, then describes the RU battery model, state transitions, evaluated policies, and emergency-service metrics.
+
 \subsection{Network and Link-Quality Model}
 
 We consider a mobile network operator (MNO) that provides cellular coverage over a discrete \(W\times H\) grid through \(N\) O-RUs (hereafter RUs), represented by the set \(R\), where \(|R|=N\). The coverage area contains a set \(U\) of users. A network-wide grid-power outage begins before the first time step, during which the RUs draw on finite local batteries. The O-CU and O-DU are assumed to remain available through backup power and are therefore excluded from the energy model. This abstraction isolates the RU-level trade-off between energy use and emergency service during the outage.
 
-The outage lasts for a horizon of \(K\) unit-duration time steps. Users and RUs are stationary, and their locations are sampled uniformly at random without replacement from the cells of the grid. Consequently, no two entities occupy the same cell. For a user \(u\in U\) and an RU \(r\in R\), with locations \(p_u=(x_u,y_u)\) and \(p_r=(x_r,y_r)\), we denote their Euclidean distance by \(d_{u,r}\).
-An in-range bipartite edge exists only when \(d_{u,r}<\rho\), where \(\rho\) is the coverage radius.  This in-range topology is fixed during a run.
+The outage lasts for a horizon of \(K\) unit-duration time steps. Users and RUs are stationary, and their locations are sampled uniformly at random without replacement from the cells of the grid. Consequently, no two entities occupy the same cell. For each user \(u\in U\) and RU \(r\in R\), with locations \(p_u=(x_u,y_u)\) and \(p_r=(x_r,y_r)\), let \(d_{u,r}\) denote their Euclidean distance. An in-range edge exists between \(u\) and \(r\) only when the user lies within the RU's coverage radius, i.e., \(d_{u,r}<\rho\), where \(\rho\) denotes the coverage radius.
 
-At every observation timestamp \(t\), each in-range edge receives a newly sampled synthetic link weight:
+At every observation timestamp \(t\), each in-range edge is assigned a newly sampled synthetic link weight, which serves as a proxy for real-world SINR behavior rather than a calculated physical SINR value:
 \begin{equation}
  w_{u,r}(t)=\left(1-\frac{d_{u,r}}{\rho}\right)\xi_{u,r}(t),
  \qquad \xi_{u,r}(t)\in(0,1].
  \label{eq:link-quality}
 \end{equation}
-The normalized score \(w_{u,r}(t)\) is the simulator's proxy for real-world SINR behavior, not a calculated physical SINR value.  Its deterministic factor \((1-d_{u,r}/\rho)\) represents expected link deterioration with distance: nearby pairs have greater baseline quality, which approaches zero as the coverage boundary is approached.  Independently at each observation, \(\xi_{u,r}(t)\) is sampled uniformly at random from \((0,1]\).  This factor represents temporal variation that can make real SINR fluctuate even for stationary users, such as changing channel or interference conditions, without explicitly computing those mechanisms.  The inclusive threshold \(\lambda\in[0,1]\) gives the eligibility rule in plain terms: an in-range link with \(w_{u,r}(t)\geq\lambda\) will be considered for association, whereas a link below \(\lambda\) will not.
+The deterministic factor \((1-d_{u,r}/\rho)\) represents expected link deterioration with distance: nearby pairs have greater baseline quality, which approaches zero as the coverage boundary is approached.  Independently at each observation, \(\xi_{u,r}(t)\) is sampled uniformly at random from \((0,1]\).  This factor represents temporal variation that can make real SINR fluctuate even for stationary users, such as changing channel or interference conditions, without explicitly computing those mechanisms.  The inclusive threshold \(\lambda\in[0,1]\) gives the eligibility rule in plain terms: an in-range link with \(w_{u,r}(t)\geq\lambda\) will be considered for association, whereas a link below \(\lambda\) will not.
 
 \subsection{Association and Outage Assumptions}
 
