@@ -15,29 +15,28 @@ At every observation timestamp \(t\), each in-range edge is assigned a newly sam
  \qquad \xi_{u,r}(t)\in(0,1].
  \label{eq:link-quality}
 \end{equation}
-The deterministic factor \((1-d_{u,r}/\rho)\) represents expected link deterioration with distance: nearby pairs have greater baseline quality, which approaches zero as the coverage boundary is approached.  Independently at each observation, \(\xi_{u,r}(t)\) is sampled uniformly at random from \((0,1]\).  This factor represents temporal variation that can make real SINR fluctuate even for stationary users, such as changing channel or interference conditions, without explicitly computing those mechanisms.  The inclusive threshold \(\lambda\in[0,1]\) gives the eligibility rule in plain terms: an in-range link with \(w_{u,r}(t)\geq\lambda\) will be considered for association, whereas a link below \(\lambda\) will not.
+The deterministic factor \((1-\frac{d_{u,r}}{\rho})\) represents expected link deterioration with distance: nearby pairs have greater baseline quality, which approaches zero as the coverage boundary is approached.  Independently at each observation, \(\xi_{u,r}(t)\) is sampled uniformly at random from \((0,1]\).  This factor represents temporal variation that can make real SINR fluctuate even for stationary users, such as changing channel or interference conditions, without explicitly computing those mechanisms.  The inclusive threshold \(\lambda\in[0,1]\) gives the eligibility rule in plain terms: an in-range link with \(w_{u,r}(t)\geq\lambda\) will be considered for association, whereas a link below \(\lambda\) will not.
 
 \subsection{Association and Outage Assumptions}
 
-Let \(a_{u,r}(t)\in\{0,1\}\) be the association decision.  Associations are exclusive, so \(\sum_{r\in R}a_{u,r}(t)\leq1\): a user has one serving RU or none.  The load on RU \(r\) is
+Let \(a_{u,r}(t)\in\{0,1\}\) denote whether user \(u\) is associated with RU \(r\) at time \(t\). Associations are exclusive, so \(\sum_{r\in R}a_{u,r}(t)\leq1\): a user has one serving RU or none. The number of users served by RU \(r\) at timestamp \(t\) is
 \begin{equation}
  n_r(t)=\sum_{u\in U}a_{u,r}(t), \qquad n_r(t)\leq C_r,
  \label{eq:ru-load}
 \end{equation}
-where \(C_r\) is its user capacity.
+where \(C_r\) is the maximum number of users that RU \(r\) can serve simultaneously.
 
-For each user in ascending user-ID order, the simulator considers candidates with \(w_{u,r}(t)\geq\lambda\), ordered by descending weight and then ascending RU ID.  It scans this ranked list and associates the user with the first RU that is active, has positive battery energy, and has spare capacity.  If no candidate meets all three conditions, the user remains unassociated.  The complete association map is recomputed independently at every observation timestamp; associations are neither sticky nor persistent across time steps.  The simulator models no handover hysteresis or minimum residence time.  Therefore, a user served by one RU at \(t-1\) may be assigned to another at \(t\) when that RU ranks first among the newly ordered eligible candidates. Such re-association incurs no modeled delay, temporary service interruption, or additional energy cost.
+At each observation timestamp \(t\), users are considered in ascending user-ID order. For each user \(u\), the candidate RUs are those for which \(w_{u,r}(t)\geq\lambda\). The candidates are ranked by descending link weight and then by ascending RU ID. The user is associated with the highest-ranked candidate that is active, has positive battery energy, and has not reached its maximum simultaneous-user limit. If no candidate meets these conditions, the user remains unassociated. Associations are recomputed independently at every observation timestamp; the model includes no handover hysteresis or minimum residence time. Therefore, a user served by one RU at \(t-1\) may be assigned to another at \(t\) when that RU ranks first among the newly ranked candidates. Such re-association incurs no modeled delay, temporary service interruption, or additional energy cost.
 
 Service is therefore defined by association rather than merely by an in-range edge:
 \begin{equation}
  y_u(t)=\sum_{r\in R}a_{u,r}(t).
 \end{equation}
 
-The outage affects the RUs, whose initial battery energies are \(b_r^0\). There is no recharge, recovery, or state-switching time or energy cost.  An RU is depleted when its battery is zero and cannot serve users.
-
 \subsection{Battery Model and State Transitions}
+The outage affects the RUs, whose initial battery energies are \(b_r^0\). We assume that there is no recharge, recovery, or state-switching time or energy cost.  An RU is depleted when its battery is zero and cannot serve users.
 
-Let \(b_r(t)\) be the battery after the update at timestamp \(t\), and let \(x_r(t)\in\{\mathrm{S},\mathrm{A}\}\) be its observed sleep or active state. With positive consumption rates \(P_s\), \(P_0\), \(P_1\), and \(P_m\), the consumption implied by the preceding state and association is
+Let \(b_r(t)\) be the battery after the update at timestamp \(t\), and let \(x_r(t)\in\{\mathrm{S},\mathrm{A}\}\) be its observed sleep or active state. At each unit-duration time step, the energy consumption of RU \(r\) depends on its state and its number of served users at the preceding timestamp. A sleeping RU consumes \(P_s\). An active RU consumes \(P_0\) when serving no users and \(P_1\) when serving one user; when serving two or more users, it consumes \(P_m\) per user. Accordingly, the energy consumed by RU \(r\) is
 \begin{equation}
  c_r(t-1)=
  \begin{cases}
@@ -47,14 +46,15 @@ Let \(b_r(t)\) be the battery after the update at timestamp \(t\), and let \(x_r
  n_r(t-1)P_m, & x_r(t-1)=\mathrm{A},\ n_r(t-1)\geq2.
  \end{cases}
  \label{eq:ru-consumption}
-\end{equation} For a unit-duration time step, battery discharge is clamped at zero:
+\end{equation}
+For a unit-duration time step, battery discharge is clamped at zero:
 \begin{equation}
  b_r(t)=\max\{0,b_r(t-1)-c_r(t-1)\}.
  \label{eq:battery-update}
 \end{equation}
 The state \(x_r(0)\) is the configured initial state, and initial associations are observed at \(t=0\).
 
-For each \(t=1,\ldots,K\), the simulator reduces the battery capacities according to the preceding status and associations, applies the policy decisions,  regenerates link weights, rebuilds associations, and then observes metrics.   A controller can activate a selected RU only when \(b_r(t)\geq P_0\); otherwise it is sleep.
+For each \(t=1,\ldots,K\), the simulator reduces the battery capacities according to the preceding status and associations, applies the policy decisions,  regenerates link weights, rebuilds associations, and then observes metrics.   Also, a controller can activate a selected RU only when \(b_r(t)\geq P_0\); otherwise it remains in sleep state.
 
 \subsection{Evaluated Policies}
 
