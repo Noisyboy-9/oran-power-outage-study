@@ -6,7 +6,11 @@ Operators must balance the need for emergency connectivity with battery lifetime
 
 These policies exemplify the fundamental trade-off between energy consumption and service availability. Keeping RUs active maximizes radio availability in the modeled scenario but accelerates battery depletion. Conversely, placing selected RUs in a low-power sleep state conserves energy but may reduce the proportion of users served. While sleep-mode mechanisms are established for reducing cellular-network energy consumption~\cite{wu2015sleep}, outage management must also maintain an acceptable level of emergency connectivity. It remains uncertain whether simple predefined RU sleep schedules can preserve a specified emergency-service target while significantly extending battery lifetime during a network-wide outage.
 
-Accordingly, this study addresses two research questions. First, how do predefined RU sleep policies affect emergency connectivity and RU battery lifetime in an O-RAN network during a power outage? Second, do the evaluated policies meet the configured emergency-service target, or do their limitations indicate a need for more adaptive outage-management policies?
+Accordingly, this study addresses two research questions:
+\begin{enumerate}
+    \item How do predefined RU sleep policies affect emergency connectivity and RU battery lifetime in an O-RAN network during a power outage?
+    \item Do the evaluated policies meet the configured emergency-service target, or do their limitations indicate a need for more adaptive outage-management policies?
+\end{enumerate}
 
 In this study, the emergency-service target is defined as maintaining a served-user fraction of at least \(0.70\) throughout the outage. To address the research questions, this paper makes three contributions:
 \begin{itemize}
