@@ -79,28 +79,23 @@ The \emph{Threshold Staggered Active} policy delays energy-saving operation to p
 \end{equation}
 From \(\tau\) onward, including \(t=\tau\), the policy applies the \emph{Staggered Active} rule using the same global timestamp, rather than restarting the schedule. If no such \(\tau\) occurs, the policy selects all RUs at every controller timestamp.
 
-\subsection{Observed Metrics}
+\subsection{Performance Metrics}
 
-emergency QoS is defined as the proportion of users receiving service at timestamp \(t\):
+Emergency QoS is defined as the proportion of users receiving service at timestamp \(t\):
 \begin{equation}
  \mathrm{QoS}(t)=\frac{1}{|U|}\sum_{u\in U}y_u(t).
 \end{equation}
-It ranges from zero, when no user is associated, to one, when all users are associated.  The average emergency QoS over the simulation horizon includes all \(K+1\) observations:
+It ranges from zero, when no user is associated, to one, when all users are associated. We denote the average emergency QoS over the \(K\)-step horizon by \(\overline{\mathrm{QoS}}\).
+
+The battery-depletion time of RU \(r\) is the first timestamp at which its battery energy reaches zero:
 \begin{equation}
- \overline{\mathrm{QoS}}=\frac{1}{K+1}\sum_{t=0}^{K}\mathrm{QoS}(t).
+ D_r=\min\{t\geq0:b_r(t)=0\}.
 \end{equation}
 
-The observed battery-depletion time of RU \(r\) is
-\begin{equation}
- D_r=\begin{cases}
- \min\{t\in\{0,\ldots,K\}:b_r(t)=0\}, & \text{if observed},\\
- \infty, & \text{otherwise}.
- \end{cases}
-\end{equation} For an emergency-service target \(\eta\), the observed network lifetime is
+For an emergency-service target \(\eta\in[0,1]\), expressed as the minimum required fraction of users receiving service, the network lifetime is the final timestamp before the first service-target violation:
 \begin{equation}
  L_\eta=\begin{cases}
  0, & \mathrm{QoS}(0)<\eta,\\
- t^\star-1, & t^\star=\min\{t\in\{1,\ldots,K\}:\mathrm{QoS}(t)<\eta\},\\
- \infty, & \mathrm{QoS}(t)\geq\eta\ \text{for all}\ t\in\{0,\ldots,K\}.
+ t^\star-1, & t^\star=\min\{t\geq1:\mathrm{QoS}(t)<\eta\}.
  \end{cases}
-\end{equation} Thus, \(D_r\) and \(L_\eta\) are bounded by the observation horizon; a value of \(\infty\) means that the corresponding depletion or service-target violation was not observed by the end of the simulation.
+\end{equation}
