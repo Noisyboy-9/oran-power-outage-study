@@ -1,6 +1,6 @@
 \section{Introduction}
 
-Reliable cellular communication is vital during disasters and large-scale power outages, when affected populations and emergency responders depend on timely information exchange. In the modeled network-wide outage scenario, O-RAN Radio Units (RUs) operate using limited local battery energy. An O-RU performs radio-facing functions~\cite{oranScArchitecture}. Under these assumptions, an RU with an exhausted battery can become a critical point of failure for users who cannot be reassociated with another active RU.
+Reliable cellular communication is vital during disasters and large-scale power outages, when affected populations and emergency responders depend on timely information exchange. In the modeled network-wide outage scenario, O-RAN Radio Units (RUs) operate using limited local battery energy. Under these assumptions, an RU with an exhausted battery can become a critical point of failure for users who cannot be reassociated with another active RU.
 
 Operators must balance the need for emergency connectivity with battery lifetime. For example, during the 2025 Iberian blackout, MEO reconfigured its mobile network and restricted mobile-data usage to preserve essential services~\cite{lusa2025meo}. Drawing on this approach to outage energy management, the present study evaluates three predefined baseline RU policies: Always Active (\policyabbr{AA}), where all non-depleted RUs remain active; Staggered Active (\policyabbr{SA}), where RU groups alternate between active and sleep states; and Threshold Staggered Active (\policyabbr{TSA}), where all RUs remain active until each RU reaches a configured battery threshold, after which staggered operation is initiated.
 
@@ -12,11 +12,12 @@ Accordingly, this study addresses two research questions:
     \item Do the evaluated policies meet the configured emergency-service target, or do their limitations indicate a need for more adaptive outage-management policies?
 \end{enumerate}
 
-In this study, the emergency-service target is defined as maintaining a served-user fraction of at least \(0.70\) throughout the outage. To address the research questions, this paper makes three contributions:
+In this study, the emergency-service target is defined as maintaining a served-user fraction of at least \(0.70\) throughout the outage. To address the research questions, this paper makes four contributions:
 \begin{itemize}
     \item It formulates a simplified, scenario-specific O-RAN outage model that captures RU battery depletion, active and sleep states, stochastic link quality, capacity-constrained user association, and emergency-service measures.
     \item It conducts controlled, paired simulations of \policyabbr{AA}, \policyabbr{SA}, and \policyabbr{TSA}, evaluating emergency Quality of Service (QoS), RU battery-depletion time, and Service Level Agreement (SLA)-based network lifetime.
     \item It quantifies the energy--service trade-off and assesses whether each predefined policy can meet the configured emergency-service target while extending battery availability.
+    \item It provides a modular, discrete-time simulation framework that separates RU control policies from the network environment, execution procedure, and metric collection, enabling future researchers to develop and compare alternative policies within the same reproducible model context.
 \end{itemize}
 
 Within the stated model configuration, \policyabbr{SA} achieves the greatest battery-lifetime extension but frequently fails to meet the emergency-service target early in the outage. In contrast, \policyabbr{TSA} maintains service lifetime comparable to \policyabbr{AA} but provides only a modest battery benefit. Therefore, while the evaluated fixed policies serve as useful reference points, they do not constitute a sufficient general basis for emergency outage management. More adaptive policy designs warrant further investigation. These conclusions are specific to the simplified model and experimental configuration and do not establish suitability for all real-world deployments.

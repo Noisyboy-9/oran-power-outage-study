@@ -48,6 +48,7 @@ Let \(b_r(t)\) be the battery after the update at timestamp \(t\), and let \(x_r
  \label{eq:ru-consumption}
 \end{equation}
 These state- and load-dependent values represent total modeled energy consumption per time step and are not calibrated hardware power measurements.
+
 For a unit-duration time step, battery discharge is clamped at zero:
 \begin{equation}
  b_r(t)=\max\{0,b_r(t-1)-c_r(t-1)\}.
