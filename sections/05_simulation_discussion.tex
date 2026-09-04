@@ -1,7 +1,7 @@
 \section{Simulation Results and Discussion}
 \label{sec:simulation-results-discussion}
 
-This section compares three predefined RU policies: Always Active (\policyabbr{AA}), Staggered Active (\policyabbr{SA}), and Threshold Staggered Active (\policyabbr{TSA}), evaluated over ten simulation repetitions.  The comparison jointly considers emergency connectivity, battery depletion, and SLA-based network lifetime, as improving one outcome at the expense of others cannot be adequately assessed by a single metric.  Table~\ref{tab:simulation-results-summary} presents the aggregate results, and Figures~\ref{fig:served-user-fraction-over-time}--\ref{fig:network-lifetime-by-policy} are referenced in the following discussion to illustrate the observed trade-offs.
+This section compares three predefined RU policies: Always Active (\policyabbr{AA}), Staggered Active (\policyabbr{SA}), and Threshold Staggered Active (\policyabbr{TSA}), evaluated over ten simulation repetitions.  The comparison jointly considers emergency connectivity, battery depletion, and SLA-based network lifetime, as improving one outcome at the expense of others cannot be adequately assessed by a single metric.  Table~\ref{tab:simulation-results-summary} presents the aggregate results, and Figures~\ref{fig:served-user-fraction-over-time}, \ref{fig:average-emergency-qos-by-policy}, \ref{fig:ru-battery-status-over-time}, and~\ref{fig:policy-summary-distributions} are referenced in the following discussion to illustrate the observed trade-offs.
 
 \input{tables/simulation_results_summary}
 
@@ -14,7 +14,7 @@ This section compares three predefined RU policies: Always Active (\policyabbr{A
     \label{fig:served-user-fraction-over-time}
 \end{figure}
 
-Figure~\ref{fig:served-user-fraction-over-time} presents the mean served-user fraction at each timestamp, with the interquartile range across the ten repetitions shaded for each policy. All policies begin with a mean served-user fraction of approximately 0.86; however, their subsequent trajectories diverge significantly. \policyabbr{AA} maintains the strongest service trajectory during the early outage period. \policyabbr{TSA} initially mirrors \policyabbr{AA}, while \policyabbr{SA} exhibits an immediate reduction in service following the start of its staggered schedule. The mean served-user fraction drops below the 0.7 SLA threshold at time 21 for both \policyabbr{AA} and \policyabbr{TSA}, but at time 1 for \policyabbr{SA}. These threshold crossings describe the aggregate trajectories in Figure~\ref{fig:served-user-fraction-over-time}; they are not the SLA-based network lifetimes of individual repetitions. The latter are calculated from each run's first SLA violation and are summarized in Table~\ref{tab:simulation-results-summary} and Figure~\ref{fig:network-lifetime-by-policy}. The periodic sleep schedule therefore reduces service availability precisely when continuous emergency connectivity is most critical.
+Figure~\ref{fig:served-user-fraction-over-time} presents the mean served-user fraction at each timestamp, with the interquartile range across the ten repetitions shaded for each policy. All policies begin with a mean served-user fraction of approximately 0.86; however, their subsequent trajectories diverge significantly. \policyabbr{AA} maintains the strongest service trajectory during the early outage period. \policyabbr{TSA} initially mirrors \policyabbr{AA}, while \policyabbr{SA} exhibits an immediate reduction in service following the start of its staggered schedule. The mean served-user fraction drops below the 0.7 SLA threshold at time 21 for both \policyabbr{AA} and \policyabbr{TSA}, but at time 1 for \policyabbr{SA}. These threshold crossings describe the aggregate trajectories in Figure~\ref{fig:served-user-fraction-over-time}; they are not the SLA-based network lifetimes of individual repetitions. The latter are calculated from each run's first SLA violation and are summarized in Table~\ref{tab:simulation-results-summary} and Figure~\ref{fig:policy-summary-distributions}(b). The periodic sleep schedule therefore reduces service availability precisely when continuous emergency connectivity is most critical.
 
 The subsequent fluctuations in the \policyabbr{SA} trajectory do not indicate network recovery. These variations occur when alternating RU groups change state, altering the set of RUs available to serve users. As the model excludes battery recharge, all three trajectories decline as stored energy is depleted.  By the end of the 100-step horizon, the mean served-user fractions for all policies approach zero.
 
@@ -38,30 +38,34 @@ Figure~\ref{fig:average-emergency-qos-by-policy} supports this time-series inter
 
 Figure~\ref{fig:ru-battery-status-over-time} illustrates the average remaining battery of each RU across the repetitions, demonstrating the anticipated energy-saving effect of placing RUs in sleep mode. Under \policyabbr{AA}, all feasible RUs remain active, resulting in the most rapid battery depletion.  \policyabbr{SA} preserves battery charge longer, as only one fixed RU group is selected during each segment of the staggered cycle. \policyabbr{TSA} represents an intermediate approach: it initially operates like \policyabbr{AA} and transitions to staggered operation only after a battery-based trigger is activated.
 
-\begin{figure}[!t]
-    \centering
-    \includegraphics[width=\columnwidth]{average_ru_battery_depletion_final_value_by_policy.png}
-    \caption{Mean RU battery-depletion time by policy.}
-    \label{fig:average-ru-battery-depletion-by-policy}
-\end{figure}
-
-Figure~\ref{fig:average-ru-battery-depletion-by-policy} summarizes this pattern by presenting the mean depletion time across the five RUs in each repetition. The median depletion times are 31.2 simulation steps for \policyabbr{AA}, 46.2 for \policyabbr{SA}, and 33.4 for \policyabbr{TSA}.  Compared to \policyabbr{AA}, \policyabbr{SA} increases the median depletion time by about 48\%, while \policyabbr{TSA} increases it by about 7\%. Both sleep-based policies extend the mean RU depletion time in every repetition, indicating that their energy benefit is consistent and not attributable to a single atypical run.
+Figure~\ref{fig:policy-summary-distributions}(a) summarizes this pattern by presenting the mean depletion time across the five RUs in each repetition. The median depletion times are 31.2 simulation steps for \policyabbr{AA}, 46.2 for \policyabbr{SA}, and 33.4 for \policyabbr{TSA}.  Compared to \policyabbr{AA}, \policyabbr{SA} increases the median depletion time by about 48\%, while \policyabbr{TSA} increases it by about 7\%. Both sleep-based policies extend the mean RU depletion time in every repetition, indicating that their energy benefit is consistent and not attributable to a single atypical run.
 
 These results illustrate the energy--service trade-off. Compared with the \policyabbr{AA} baseline, \policyabbr{SA} increases the median mean RU depletion time by about 48\%, from 31.2 to 46.2 simulation steps, but this benefit comes with the weakest service performance over time and the lowest average QoS. \policyabbr{TSA} provides a smaller but consistent 7\% increase in median mean RU depletion time, from 31.2 to 33.4 simulation steps, while maintaining service levels much closer to those of \policyabbr{AA}. This outcome aligns with the policy logic: delaying sleep scheduling preserves early service availability but reduces the remaining outage horizon available for energy savings.
 
 \subsection{SLA-Based Network Lifetime and Policy Suitability}
 
-\begin{figure}[!t]
-    \centering
-    \includegraphics[width=\columnwidth]{network_lifetime_final_value_by_policy.png}
-    \caption{SLA-based network lifetime by policy.}
-    \label{fig:network-lifetime-by-policy}
-\end{figure}
-
-Figure~\ref{fig:network-lifetime-by-policy} evaluates the policies using SLA-based network lifetime, which is a stricter measure than horizon-average QoS. It measures how long the network keeps the served-user fraction at or above the SLA threshold of 0.7 before falling below it for the first time. A network lifetime of zero means that, at the start of the outage, fewer than 70\% of users were served. The network therefore failed to meet the SLA target immediately, although it may still have provided service to some users. Once the served-user fraction falls below the threshold, later increases do not change the recorded network lifetime.
+Figure~\ref{fig:policy-summary-distributions}(b) evaluates the policies using SLA-based network lifetime, which is a stricter measure than horizon-average QoS. It measures how long the network keeps the served-user fraction at or above the SLA threshold of 0.7 before falling below it for the first time. A network lifetime of zero means that, at the start of the outage, fewer than 70\% of users were served. The network therefore failed to meet the SLA target immediately, although it may still have provided service to some users. Once the served-user fraction falls below the threshold, later increases do not change the recorded network lifetime.
 
 \policyabbr{AA} achieves a median network lifetime of 21.0 steps, while \policyabbr{TSA} closely matches this with a median of 20.5 steps.  \policyabbr{TSA} equals \policyabbr{AA}'s network lifetime in eight out of ten repetitions and is lower in the remaining two. In contrast, \policyabbr{SA} exhibits a median network lifetime of zero and an interquartile range of 0.0--17.3 steps. These findings indicate that \policyabbr{SA}'s periodic staggering frequently fails to meet the SLA before it can deliver a sustained emergency service interval, despite its subsequent battery advantage.
 
 Collectively, these findings address the first research question: predefined RU sleep policies influence emergency connectivity and battery lifetime in opposite directions. Compared with \policyabbr{AA}, \policyabbr{SA} extends the median mean RU depletion time by approximately 48\%, but it results in the weakest emergency-service performance and a median SLA-based network lifetime of zero. \policyabbr{TSA} offers a more balanced outcome, increasing median mean RU depletion time by about 7\% while maintaining a median SLA-based network lifetime of 20.5 steps, nearly matching the 21.0 steps achieved by \policyabbr{AA}.
 
 The findings also address the second research question. \policyabbr{SA} does not reliably meet the configured emergency-service target because its fixed staggered schedule frequently causes an immediate SLA violation. \policyabbr{TSA} is more suitable among the evaluated policies, as it preserves service levels close to those of \policyabbr{AA}, although its battery benefit remains modest. Thus, the evaluated fixed policies demonstrate the energy--service trade-off but do not offer a sufficient general solution for emergency outage management. Further research should investigate more adaptive policies to achieve greater energy savings without compromising the service target.
+
+\begin{figure*}[!t]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{average_ru_battery_depletion_final_value_by_policy.png}
+        \par\smallskip
+        \footnotesize (a) Mean RU battery-depletion time.
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{network_lifetime_final_value_by_policy.png}
+        \par\smallskip
+        \footnotesize (b) SLA-based network lifetime.
+    \end{minipage}
+    \caption{Distribution of battery-depletion time and SLA-based network lifetime by policy.}
+    \label{fig:policy-summary-distributions}
+\end{figure*}
